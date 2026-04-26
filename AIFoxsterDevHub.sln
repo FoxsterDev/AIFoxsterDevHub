@@ -2,6 +2,7 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Workspace", "Workspace", "{3C98D1EF-41B4-4A9E-9B73-A3C9775B6D0B}"
 	ProjectSection(SolutionItems) = preProject
+		LFS_MIGRATION_PLAN.md = LFS_MIGRATION_PLAN.md
 		WORKSPACE.md = WORKSPACE.md
 		scripts\refresh-aifoxster-hub.sh = scripts\refresh-aifoxster-hub.sh
 	EndProjectSection

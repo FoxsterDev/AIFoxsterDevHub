@@ -31,6 +31,7 @@ PROJECT_SPECS=(
 )
 
 WORKSPACE_ITEMS=(
+  "LFS_MIGRATION_PLAN.md"
   "WORKSPACE.md"
   "scripts/refresh-aifoxster-hub.sh"
 )
