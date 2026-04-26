@@ -26,12 +26,6 @@ PROJECT_SPECS=(
   "DevAccelerationSystem/Authoring|DevAccelerationSystem/DevAccelerationSystem/DevAccelerationSystem.Core.csproj"
   "DevAccelerationSystem/Authoring|DevAccelerationSystem/DevAccelerationSystem/DevAccelerationSystem.ProjectCompilationCheck.csproj"
   "DevAccelerationSystem/Authoring|DevAccelerationSystem/DevAccelerationSystem/DevAccelerationSystem.Editor.Tests.csproj"
-  "DevAccelerationSystem/Authoring|DevAccelerationSystem/DevAccelerationSystem/TheBestLogger.Core.csproj"
-  "DevAccelerationSystem/Authoring|DevAccelerationSystem/DevAccelerationSystem/TheBestLogger.Core.Utilities.csproj"
-  "DevAccelerationSystem/Authoring|DevAccelerationSystem/DevAccelerationSystem/TheBestLogger.Examples.csproj"
-  "DevAccelerationSystem/Authoring|DevAccelerationSystem/DevAccelerationSystem/StabilityHub.csproj"
-  "DevAccelerationSystem/Authoring|DevAccelerationSystem/DevAccelerationSystem/TheBestLogger.EditorTests.csproj"
-  "DevAccelerationSystem/Authoring|DevAccelerationSystem/DevAccelerationSystem/CrashReporteriOS.Editor.csproj"
   "DevAccelerationSystem/Consumers/DemoProject|DevAccelerationSystem/DevAccelerationSystem.DemoProject/TheBestLoggerSample.csproj"
   "DevAccelerationSystem/Consumers/DemoProject|DevAccelerationSystem/DevAccelerationSystem.DemoProject/TheBestLogger.Integration.Tests.csproj"
 )
@@ -92,6 +86,25 @@ project_guid() {
 
 project_name() {
   basename "$1" .csproj
+}
+
+discover_thebestlogger_project_specs() {
+  local project_dir="$ROOT_DIR/DevAccelerationSystem/DevAccelerationSystem"
+  local project_path basename
+
+  while IFS= read -r project_path; do
+    basename="$(basename "$project_path")"
+
+    case "$basename" in
+      Assembly-CSharp*.csproj|*.Player.csproj)
+        continue
+        ;;
+    esac
+
+    if rg -q 'Assets/TheBestLogger/' "$project_path"; then
+      printf 'DevAccelerationSystem/Authoring|%s\n' "${project_path#"$ROOT_DIR/"}"
+    fi
+  done < <(find "$project_dir" -maxdepth 1 -name '*.csproj' | sort)
 }
 
 emit_solution_folder() {
@@ -166,6 +179,10 @@ assert_paths_exist() {
 }
 
 assert_paths_exist
+
+while IFS= read -r item; do
+  [[ -n "$item" ]] && PROJECT_SPECS+=("$item")
+done < <(discover_thebestlogger_project_specs)
 
 {
   printf 'Microsoft Visual Studio Solution File, Format Version 12.00\n'
