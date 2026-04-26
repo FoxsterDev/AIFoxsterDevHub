@@ -1,0 +1,12 @@
+[submodule "AIRoot"]
+	path = AIRoot
+	url = https://github.com/FoxsterDev/ai-research-hub.git
+	branch = master
+[submodule "ConnectivityCheckerPro"]
+	path = ConnectivityCheckerPro
+	url = https://github.com/FoxsterDev/ConnectivityCheckerPro.git
+	branch = main
+[submodule "DevAccelerationSystem"]
+	path = DevAccelerationSystem
+	url = https://github.com/FoxsterDev/DevAccelerationSystem.git
+	branch = master
