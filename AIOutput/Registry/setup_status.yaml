@@ -1,0 +1,22 @@
+setup_state: provisioned
+host_root: /Users/SiarheiKhaPersonal/Projects/AIFoxsterDevHub
+airroot_root: AIRoot/
+profile_id: monorepo_overlay_default
+repo_mode: monorepo
+overlay_expected: true
+overlay_root: AIModules/XUUnityInternal/
+report_scaffold_status: scaffolded
+project_memory_baseline_status: seeded_or_existing
+last_provisioned_at: 2026-04-26T18:21:21Z
+routed_projects:
+  - ConnectivityCheckerPro/ConnectivityCheckerPro_Publish
+  - ConnectivityCheckerPro/ConnectivityCheckerPro_Sample2021
+  - ConnectivityCheckerPro/ConnectivityCheckerPro_Sample2022
+  - ConnectivityCheckerPro/ConnectivityCheckerPro_Sample6000
+  - ConnectivityCheckerPro/ConnectivityCheckerPro_Sample6000_3_2f1
+  - DevAccelerationSystem/DevAccelerationSystem
+  - DevAccelerationSystem/DevAccelerationSystem.DemoProject
+  - DevAccelerationSystem/DAS.LocalProject
+
+warnings:
+  []

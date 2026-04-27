@@ -1,0 +1,21 @@
+profile_id: monorepo_overlay_default
+repo_mode: monorepo
+storage_profile: project-local
+router_mode: repo-and-project
+project_link_mode: direct
+solution_mode: none
+active_repo_router: Agents.md
+active_project_memory_root: <Project>/Assets/AIOutput/ProjectMemory/
+active_project_reports_root: <Project>/Assets/AIOutput/
+active_project_skill_overrides_root: <Project>/Assets/AIOutput/ProjectMemory/SkillOverrides/
+internal_overlay_root: AIModules/XUUnityInternal/
+routed_projects:
+  - ConnectivityCheckerPro/ConnectivityCheckerPro_Publish
+  - ConnectivityCheckerPro/ConnectivityCheckerPro_Sample2021
+  - ConnectivityCheckerPro/ConnectivityCheckerPro_Sample2022
+  - ConnectivityCheckerPro/ConnectivityCheckerPro_Sample6000
+  - ConnectivityCheckerPro/ConnectivityCheckerPro_Sample6000_3_2f1
+  - DevAccelerationSystem/DevAccelerationSystem
+  - DevAccelerationSystem/DevAccelerationSystem.DemoProject
+  - DevAccelerationSystem/DAS.LocalProject
+

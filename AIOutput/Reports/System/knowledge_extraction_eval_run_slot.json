@@ -1,0 +1,10 @@
+{
+  "managed_by": "AIRoot/scripts/init_ai_repo.sh report-scaffold",
+  "status": "waiting_for_real_run",
+  "canonical_targets": [
+    "knowledge_extraction_eval_baseline_v1_run.json",
+    "knowledge_extraction_eval_latest_summary.json"
+  ],
+  "source_case_pack": "AIRoot/Operations/XUUNITY_KNOWLEDGE_EXTRACTION_GOLDEN_CASES.json",
+  "note": "Bootstrap creates this slot so the host knows which real extraction evidence files should appear after evaluation."
+}
