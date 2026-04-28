@@ -8,7 +8,8 @@ Use this file when project selection, ownership, or canonical-source routing mat
 - Repo root solution: `AIFoxsterDevHub.sln`
 - Public protocol core: `AIRoot/Modules/XUUnity/`
 - Host-local overlay: `AIModules/XUUnityInternal/`
-- Two nested git repos:
+- Three nested git repos or tracked submodules:
+  - `AIRoot/`
   - `ConnectivityCheckerPro/`
   - `DevAccelerationSystem/`
 

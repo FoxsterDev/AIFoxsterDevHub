@@ -27,6 +27,10 @@ Use this file when deciding where code should be edited and where the result sho
 - Use `DAS.LocalProject/` for local repro or local validation when helpful, but remember that the nested repo ignores it.
 
 ## Git Boundary Rules
-- The hub root is one git repo, but `ConnectivityCheckerPro/` and `DevAccelerationSystem/` are nested git repos with their own status and commits.
-- If a task changes files in both nested repos, review and commit them separately.
+- The hub root is one git repo, and it tracks `AIRoot/`, `ConnectivityCheckerPro/`, and `DevAccelerationSystem/` as separate submodule commit surfaces.
+- If a task changes files in more than one submodule repo, review and commit them separately.
+- If the user runs a host-level `commit all changes`, `push all changes`, or `publish all changes`, treat that as a cascade request across every dirty submodule repo plus the host repo.
+- If a task changes a submodule and the hub root, push the submodule commit first, then commit and push the hub-root pointer update.
+- If the host repo has both its own file edits and submodule pointer movement, split them into separate host commits by default.
+- If the hub root has only submodule pointer movement, prefer a pointer-only hub commit instead of mixing it with unrelated root edits.
 - Repo-level routers in the hub should not hide nested-repo commit boundaries.

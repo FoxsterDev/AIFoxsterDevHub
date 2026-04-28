@@ -23,6 +23,7 @@ Use this file only when the current task is inside this hub and the host-specifi
   - engine-line-specific consumer choice
   - authoring-versus-validation workspace separation
   - commit-surface or release-proof interpretation for local-only workspaces
+  - submodule commit or push ordering
 - Load both files when a task spans package implementation plus consumer validation planning.
 
 ## Host Routing Rules
@@ -34,7 +35,9 @@ Use this file only when the current task is inside this hub and the host-specifi
 3. If a change affects shared package behavior, implement it in the canonical source project first.
 4. Use consumer workspaces primarily for repro, validation, and integration checks unless the consumer intentionally owns a divergent copy.
 5. If the task spans package source and consumer workspaces, keep one implementation target and name the validation target explicitly.
-6. If the task touches two nested git repos, call out commit boundaries instead of treating the hub as one commit surface.
+6. If the task touches more than one submodule repo, call out commit boundaries instead of treating the hub as one commit surface.
+7. If the task touches a nested repo or `AIRoot/` plus the hub root, commit and push the nested repo first, then land the hub-root pointer update as a separate commit.
+8. If the user asks for `commit all changes` or `push all changes` at the hub root, traverse every dirty submodule repo first, then return to the hub root for pointer updates and any remaining host-owned commits.
 
 ## Canonical Source Rules
 - `ConnectivityCheckerPro/ConnectivityCheckerPro_Publish/` is the canonical source for `ConnectivityCheckerPro`.
