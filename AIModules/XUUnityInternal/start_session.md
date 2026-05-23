@@ -24,6 +24,11 @@ Use this file only when the current task is inside this hub and the host-specifi
   - authoring-versus-validation workspace separation
   - commit-surface or release-proof interpretation for local-only workspaces
   - submodule commit or push ordering
+- Load `knowledge/runtime_safety_rules.md` when the task needs:
+  - async disposal, teardown, or shutdown safety on the Unity main thread
+  - deadlock avoidance for sync waits over async cleanup paths
+  - platform-native target testability without widening the public API
+  - runtime-path validation strategy for `Log()` or `LogBatch()` platform targets
 - Load both files when a task spans package implementation plus consumer validation planning.
 
 ## Host Routing Rules
