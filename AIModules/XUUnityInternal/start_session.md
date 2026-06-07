@@ -51,7 +51,7 @@ Use this file only when the current task is inside this hub and the host-specifi
 
 ## Known Exception Rules
 - `ConnectivityCheckerPro/ConnectivityCheckerPro_Sample2022/` contains its own embedded `Assets/ConnectivityCheckerPro` copy and is not auto-synced from `ConnectivityCheckerPro_Publish/`.
-- `DevAccelerationSystem/DAS.LocalProject/` is a local validation workspace and is ignored by the nested repo's `.gitignore`.
+- `DevAccelerationSystem/DAS.LocalProject/` is an optional local-only validation workspace, may be absent, and is ignored by the nested repo's `.gitignore`.
 
 ## Validation Rules
 - Use `AIFoxsterDevHub.sln` for package authoring and static code navigation at the hub level.

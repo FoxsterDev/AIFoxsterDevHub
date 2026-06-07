@@ -16,7 +16,11 @@ routed_projects:
   - ConnectivityCheckerPro/ConnectivityCheckerPro_Sample6000_3_2f1
   - DevAccelerationSystem/DevAccelerationSystem
   - DevAccelerationSystem/DevAccelerationSystem.DemoProject
-  - DevAccelerationSystem/DAS.LocalProject
+optional_local_projects:
+  - path: DevAccelerationSystem/DAS.LocalProject
+    kind: local_validation_consumer
+    status: optional_absent_ok
+    tracked_release_proof: false
 
 warnings:
   []

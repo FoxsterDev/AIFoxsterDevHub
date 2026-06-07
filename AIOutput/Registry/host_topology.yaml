@@ -17,5 +17,15 @@ routed_projects:
   - ConnectivityCheckerPro/ConnectivityCheckerPro_Sample6000_3_2f1
   - DevAccelerationSystem/DevAccelerationSystem
   - DevAccelerationSystem/DevAccelerationSystem.DemoProject
-  - DevAccelerationSystem/DAS.LocalProject
-
+optional_local_projects:
+  - path: DevAccelerationSystem/DAS.LocalProject
+    kind: local_validation_consumer
+    status: optional_absent_ok
+    tracked_release_proof: false
+routed_operation_projects:
+  - path: AIRoot/Operations/XUUnityLightUnityMcp
+    kind: public_unity_mcp_tooling
+    router: AIRoot/Operations/XUUnityLightUnityMcp/Agents.md
+    child_routes:
+      - path: AIRoot/Operations/XUUnityLightUnityMcp/docs/clients
+        router: AIRoot/Operations/XUUnityLightUnityMcp/docs/clients/Agents.md

@@ -24,7 +24,7 @@ Use this file when deciding where code should be edited and where the result sho
 ## DevAccelerationSystem Guidance
 - Shared package fixes start in `DevAccelerationSystem/`.
 - Use `DevAccelerationSystem.DemoProject/` for tracked consumer validation.
-- Use `DAS.LocalProject/` for local repro or local validation when helpful, but remember that the nested repo ignores it.
+- Use `DAS.LocalProject/` only as optional local-only repro or validation when it exists; remember that the nested repo ignores it and it is not tracked release proof.
 
 ## Git Boundary Rules
 - The hub root is one git repo, and it tracks `AIRoot/`, `ConnectivityCheckerPro/`, and `DevAccelerationSystem/` as separate submodule commit surfaces.

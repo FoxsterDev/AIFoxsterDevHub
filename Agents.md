@@ -23,6 +23,8 @@ Use it to select shared prompt families, define load order, and route project-lo
 ## Routing Table
 - Use `xuunity` as the default protocol for Unity implementation, review, refactoring, product-facing implementation explanation, SDK work, native work, runtime safety, startup, performance, and compliance.
 - Use host-local protocol families only when the host intentionally attaches them under `AIModules/`.
+- For tasks under `AIRoot/Operations/XUUnityLightUnityMcp/`, route to `AIRoot/Operations/XUUnityLightUnityMcp/Agents.md` before project-specific work. This child project is a public MCP tooling repo, not a host Unity consumer project.
+- For tasks under `AIRoot/Operations/XUUnityLightUnityMcp/docs/clients/`, route through the MCP project router first, then the local client-docs router in that folder.
 
 ## Fast Shortcuts
 - `xuunity fix this bug`
@@ -37,6 +39,7 @@ Use it to select shared prompt families, define load order, and route project-lo
 
 ## Prompt Family Map
 - `xuunity` -> public core `AIRoot/Modules/XUUnity/` plus internal overlay `AIModules/XUUnityInternal/` when the host uses it
+- `xuunity-light-unity-mcp` -> public tooling project `AIRoot/Operations/XUUnityLightUnityMcp/` plus its project router and docs/agents guidance
 - optional host-local protocol families -> `AIModules/` when the host attaches them
 
 ## Project Memory Override Rule
