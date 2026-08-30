@@ -109,10 +109,10 @@ Unity Editor (PID 93141) is running but has compilation errors that prevent MCP 
 **Evidence**:
 ```
 LocalPriceAmount.cs(14,10): error CS0246: The type or namespace name 'JsonPropertyAttribute' could not be found
-Library/PackageCache/com.aghanim.sdk@99b91b367c49/.../LocalPriceAmount.cs: Missing JsonProperty
+Library/PackageCache/<removed-local-sdk>/.../LocalPriceAmount.cs: Missing JsonProperty
 ```
 
-**Root Cause**: Missing dependency - `com.aghanim.sdk` package requires Newtonsoft.Json (or similar JSON serialization library) which is not installed.
+**Root Cause**: A legacy local SDK tarball required Newtonsoft.Json (or similar JSON serialization library), which was not installed. That package reference was removed on 2026-08-30.
 
 **Health Status**:
 - Editor running: ✅ (PID 93141 alive)
@@ -176,7 +176,7 @@ Library/PackageCache/com.aghanim.sdk@99b91b367c49/.../LocalPriceAmount.cs: Missi
 
 ### Option 1: Fix Compilation Errors (Sample2022)
 
-Install missing dependency for `com.aghanim.sdk`:
+Historical option before the legacy local SDK package was removed:
 
 ```bash
 # Add Newtonsoft.Json via Package Manager

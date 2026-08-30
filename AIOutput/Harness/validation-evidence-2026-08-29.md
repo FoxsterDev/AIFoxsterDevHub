@@ -50,7 +50,7 @@ All seven tracked consumers pin the tag URL and lock the peeled hash. No old
 | --- | --- | --- | --- | --- |
 | CCP-PUB | 2022.3.62f3 | pass | pass | compiled |
 | CCP-S21 | 2021.3.45f2 | pass | pass | compiled; pre-existing asmdef ownership warning only |
-| CCP-S22 | 2022.3.62f3 | pass | blocked | missing absolute `com.aghanim.sdk-1.0.0.tgz` baseline |
+| CCP-S22 | 2022.3.62f3 | pass | pass | compiled after obsolete local-SDK dependency removal on 2026-08-30 |
 | CCP-S60 | 6000.0.58f2 | pass | pass | compiled |
 | CCP-S63 | 6000.3.3f1 | structural lock only | not run | exact editor unavailable |
 | DAS-SRC | 2022.3.62f3 | pass | pass | compiled |
@@ -74,7 +74,7 @@ No product/package runtime was modified to manufacture a pilot result.
 
 This refresh is implementation-green for static Harness routing and for the
 listed package-source/consumer slices, but not release-green for the entire
-Hub. CCP-S22 and CCP-S63 retain the explicit ceilings above. Native permission,
+Hub. CCP-S63 retains the explicit ceiling above. Native permission,
 hardware, store, Addressables, migration, and physical-device claims were not
 in the changed runtime surface and were not manufactured.
 

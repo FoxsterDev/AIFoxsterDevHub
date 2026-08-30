@@ -20,10 +20,10 @@ Updated: 2026-08-29
   with EditMode 91/91, PlayMode 5/5, three scenarios, and StandaloneOSX batch
   compile. Clean Hub consumer resolve/compile passed CCP-PUB, CCP-S21,
   CCP-S60, DAS-SRC, and DAS-DEMO.
-- Honest red baseline: CCP-S22 resolved MCP `v0.3.62` and then failed because
-  its absolute Aghanim tarball is absent. CCP-S63 requires exact
-  `6000.3.3f1`, which is not installed; its lock is structurally aligned but
-  has no exact-editor live proof.
+- Follow-up proof on 2026-08-30: CCP-S22's obsolete absolute local-SDK
+  dependency was removed; clean resolve/compile passes on exact Unity
+  `2022.3.62f3`. CCP-S63 still requires exact `6000.3.3f1`, which is not
+  installed; its lock is structurally aligned but has no exact-editor proof.
 - Hook: the Stop gate is static and scoped to Harness routing/config only. It
   must still be explicitly trusted by the owner through `/hooks`.
 - Final generated-state cleanup: no `Library/` directory remains in any of the

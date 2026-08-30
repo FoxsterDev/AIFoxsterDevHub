@@ -61,8 +61,9 @@ prefers archive/deprecation where ownership or replacement is uncertain.
 
 - Connectivity exact editors: 2021.3.45f2, 2022.3.62f3, 6000.0.58f2, and
   6000.3.3f1. The last is not installed; 6000.3.21f1 is not an exact substitute.
-- Connectivity Sample2022 has an unavailable absolute Aghanim tarball and a
-  divergent embedded package copy; it cannot be called release-green.
+- Connectivity Sample2022 retains a divergent embedded package copy. Its
+  obsolete absolute local-SDK dependency was removed on 2026-08-30 and the
+  project then passed clean resolve/compile on exact Unity `2022.3.62f3`.
 - DAS source and demo use 2022.3.62f3; static package validation was green.
 - Build targets are not established by tracked files alone and must be recorded
   at execution time.
