@@ -1,0 +1,61 @@
+{
+  "schema_version": 1,
+  "cases": [
+    {
+      "id": "UH-01-docs-only",
+      "expected_lane": "docs",
+      "required_proofs": ["diff-review", "static"],
+      "max_outcomes": 0,
+      "candidate": {"lane": "docs", "proofs": ["diff-review", "static"], "ceiling": "static", "verdict": "pass", "outcome_count": 0}
+    },
+    {
+      "id": "UH-02-contained-csharp",
+      "expected_lane": "ordinary",
+      "required_proofs": ["exact-version", "compile", "editmode-focused"],
+      "max_outcomes": 1,
+      "candidate": {"lane": "ordinary", "proofs": ["exact-version", "compile", "editmode-focused"], "ceiling": "editmode", "verdict": "pass", "outcome_count": 0}
+    },
+    {
+      "id": "UH-03-package-consumer",
+      "expected_lane": "ordinary",
+      "required_proofs": ["package-source", "consumer-resolve", "consumer-compile"],
+      "max_outcomes": 1,
+      "candidate": {"lane": "ordinary", "proofs": ["package-source", "consumer-resolve", "consumer-compile"], "ceiling": "compiled", "verdict": "pass", "outcome_count": 1}
+    },
+    {
+      "id": "UH-04-serialized-scene",
+      "expected_lane": "high-risk",
+      "required_proofs": ["serialized-diff", "compile", "reopen", "playmode-focused"],
+      "max_outcomes": 1,
+      "candidate": {"lane": "high-risk", "proofs": ["serialized-diff", "compile", "reopen", "playmode-focused"], "ceiling": "serialized-reopen", "verdict": "pass", "outcome_count": 1}
+    },
+    {
+      "id": "UH-05-save-compatibility",
+      "expected_lane": "high-risk",
+      "required_proofs": ["versioned-fixtures", "migration-idempotence", "rollback", "compatibility-matrix"],
+      "max_outcomes": 1,
+      "candidate": {"lane": "high-risk", "proofs": ["versioned-fixtures", "migration-idempotence", "rollback", "compatibility-matrix"], "ceiling": "playmode", "verdict": "pass", "outcome_count": 1}
+    },
+    {
+      "id": "UH-06-native-device-only",
+      "expected_lane": "high-risk",
+      "required_proofs": ["platform-build", "device-unavailable-recorded"],
+      "max_outcomes": 1,
+      "candidate": {"lane": "high-risk", "proofs": ["platform-build", "device-unavailable-recorded"], "ceiling": "platform-build", "verdict": "partial", "outcome_count": 1, "claims_device_behavior": false}
+    },
+    {
+      "id": "UH-07-unity-version-matrix",
+      "expected_lane": "release",
+      "required_proofs": ["exact-version-matrix", "build-target-recorded", "package-source", "consumer-compile"],
+      "max_outcomes": 1,
+      "candidate": {"lane": "release", "proofs": ["exact-version-matrix", "build-target-recorded", "package-source", "consumer-compile"], "ceiling": "release", "verdict": "pass", "outcome_count": 1}
+    },
+    {
+      "id": "UH-08-release-intentional-failure",
+      "expected_lane": "release",
+      "required_proofs": ["mandatory-failure-recorded", "release-blocked"],
+      "max_outcomes": 1,
+      "candidate": {"lane": "release", "proofs": ["mandatory-failure-recorded", "release-blocked"], "ceiling": "compiled", "verdict": "blocked", "outcome_count": 1, "claims_release_ready": false}
+    }
+  ]
+}

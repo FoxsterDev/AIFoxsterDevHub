@@ -12,18 +12,19 @@ Use it to select shared prompt families, define load order, and route project-lo
 - Shared public core: `AIRoot/Modules/XUUnity/`
 
 ## Load Order
-1. This repo-level `Agents.md`
-2. Shared protocol modules from `AIRoot/Modules/`, with `xuunity` loading public core from `AIRoot/Modules/XUUnity/`
-3. Optional monorepo-internal overlay from `AIModules/XUUnityInternal/` when the host uses it
-4. Other host-local prompt families from `AIModules/` when the selected protocol is host-local
-5. Project-level `Agents.md`
-6. Project-local memory from `<Project>/Assets/AIOutput/ProjectMemory/`
-7. Project-local previous AI outputs from `<Project>/Assets/AIOutput/` when they are relevant
+1. This repo-level `AGENTS.md`
+2. Optional compact host kernel at `AIOutput/Harness/KERNEL.md` when the host owns it
+3. Shared protocol modules from `AIRoot/Modules/`, with `xuunity` loading public core from `AIRoot/Modules/XUUnity/`
+4. Optional monorepo-internal overlay from `AIModules/XUUnityInternal/` when the host uses it
+5. Other host-local prompt families from `AIModules/` when the selected protocol is host-local
+6. Project-level `AGENTS.md`
+7. Project-local memory from `<Project>/Assets/AIOutput/ProjectMemory/`
+8. Project-local previous AI outputs from `<Project>/Assets/AIOutput/` when they are relevant
 
 ## Routing Table
 - Use `xuunity` as the default protocol for Unity implementation, review, refactoring, product-facing implementation explanation, SDK work, native work, runtime safety, startup, performance, and compliance.
 - Use host-local protocol families only when the host intentionally attaches them under `AIModules/`.
-- For tasks under `AIRoot/Operations/XUUnityLightUnityMcp/`, route to `AIRoot/Operations/XUUnityLightUnityMcp/Agents.md` before project-specific work. This child project is a public MCP tooling repo, not a host Unity consumer project.
+- For tasks under `AIRoot/Operations/XUUnityLightUnityMcp/`, route to its child-owned exact `AIRoot/Operations/XUUnityLightUnityMcp/AGENTS.md` before project-specific work. This independently versioned tooling satellite remains standalone-capable; the host only augments it when available.
 - For tasks under `AIRoot/Operations/XUUnityLightUnityMcp/docs/clients/`, route through the MCP project router first, then the local client-docs router in that folder.
 
 ## Fast Shortcuts
@@ -39,8 +40,8 @@ Use it to select shared prompt families, define load order, and route project-lo
 
 ## Prompt Family Map
 - `xuunity` -> public core `AIRoot/Modules/XUUnity/` plus internal overlay `AIModules/XUUnityInternal/` when the host uses it
-- `xuunity-light-unity-mcp` -> public tooling project `AIRoot/Operations/XUUnityLightUnityMcp/` plus its project router and docs/agents guidance
 - optional host-local protocol families -> `AIModules/` when the host attaches them
+- `xuunity-light-unity-mcp` -> public tooling project `AIRoot/Operations/XUUnityLightUnityMcp/` plus its project router and docs/agents guidance
 
 ## Project Memory Override Rule
 - Project-specific memory in `<Project>/Assets/AIOutput/ProjectMemory/` overrides shared prompts when there is a conflict.

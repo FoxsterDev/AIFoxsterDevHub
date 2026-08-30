@@ -31,8 +31,8 @@ lightweight Unity MCP package and client setup docs.
 
 Use its project router for parent-workspace tasks that target the MCP repo:
 
-- `AIRoot/Operations/XUUnityLightUnityMcp/Agents.md`
-- `AIRoot/Operations/XUUnityLightUnityMcp/docs/clients/Agents.md`
+- `AIRoot/Operations/XUUnityLightUnityMcp/AGENTS.md`
+- `AIRoot/Operations/XUUnityLightUnityMcp/docs/clients/AGENTS.md`
 
 Keep MCP implementation changes inside that nested repo unless the task
 explicitly targets a consumer Unity project for validation or setup.

@@ -4,7 +4,7 @@ storage_profile: project-local
 router_mode: repo-and-project
 project_link_mode: direct
 solution_mode: none
-active_repo_router: Agents.md
+active_repo_router: AGENTS.md
 active_project_memory_root: <Project>/Assets/AIOutput/ProjectMemory/
 active_project_reports_root: <Project>/Assets/AIOutput/
 active_project_skill_overrides_root: <Project>/Assets/AIOutput/ProjectMemory/SkillOverrides/
@@ -25,7 +25,8 @@ optional_local_projects:
 routed_operation_projects:
   - path: AIRoot/Operations/XUUnityLightUnityMcp
     kind: public_unity_mcp_tooling
-    router: AIRoot/Operations/XUUnityLightUnityMcp/Agents.md
+    router: AIRoot/Operations/XUUnityLightUnityMcp/AGENTS.md
+    status: active_stable_v0_3_62
     child_routes:
       - path: AIRoot/Operations/XUUnityLightUnityMcp/docs/clients
-        router: AIRoot/Operations/XUUnityLightUnityMcp/docs/clients/Agents.md
+        router: AIRoot/Operations/XUUnityLightUnityMcp/docs/clients/AGENTS.md

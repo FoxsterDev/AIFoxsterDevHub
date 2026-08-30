@@ -33,10 +33,10 @@ Use this file when project selection, ownership, or canonical-source routing mat
 
 ## XUUnityLightUnityMcp Map
 - Public MCP tooling project: `AIRoot/Operations/XUUnityLightUnityMcp/`
-- Project router: `AIRoot/Operations/XUUnityLightUnityMcp/Agents.md`
+- Project router: `AIRoot/Operations/XUUnityLightUnityMcp/AGENTS.md`
 - Unity package source: `AIRoot/Operations/XUUnityLightUnityMcp/packages/com.xuunity.light-mcp/`
 - Client docs route: `AIRoot/Operations/XUUnityLightUnityMcp/docs/clients/`
-- Client docs router: `AIRoot/Operations/XUUnityLightUnityMcp/docs/clients/Agents.md`
+- Client docs router: `AIRoot/Operations/XUUnityLightUnityMcp/docs/clients/AGENTS.md`
 
 ## Selection Rules
 - Package code changes belong in canonical source projects.
