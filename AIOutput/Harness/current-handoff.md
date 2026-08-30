@@ -14,6 +14,8 @@ Updated: 2026-08-29
 - Child commits: AIRoot `b03874f1cd68eb3f9d627c71c8826d18a14aaefa`;
   Connectivity `7f56a5932c37f5cfa71658beef4863a74199fbd7`;
   DAS `5995aada17657a8e53c2148e27967babb733a4de`.
+- Root convergence commit:
+  `1da888cda854b1d590fedd071252b2d46fe903f3`.
 - Live proof: MCP clean matrix passed Unity `2022.3.67f2` and `6000.0.58f2`
   with EditMode 91/91, PlayMode 5/5, three scenarios, and StandaloneOSX batch
   compile. Clean Hub consumer resolve/compile passed CCP-PUB, CCP-S21,
@@ -24,4 +26,7 @@ Updated: 2026-08-29
   has no exact-editor live proof.
 - Hook: the Stop gate is static and scoped to Harness routing/config only. It
   must still be explicitly trusted by the owner through `/hooks`.
+- Final generated-state cleanup: no `Library/` directory remains in any of the
+  seven tracked Unity project roots; the next Editor open will regenerate from
+  clean state.
 - Detailed evidence: `AIOutput/Harness/validation-evidence-2026-08-29.md`.
