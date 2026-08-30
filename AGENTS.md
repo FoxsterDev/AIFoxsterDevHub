@@ -55,6 +55,12 @@ Use it to select shared prompt families, define load order, and route project-lo
 - Public reusable `xuunity` guidance belongs in `AIRoot/Modules/XUUnity/`.
 - Monorepo-internal shared `xuunity` guidance belongs in `AIModules/XUUnityInternal/`.
 
+## Working Language Rule
+- Respond conversationally in the language used by the user unless the user asks for another language.
+- Write operational prompts, agent instructions, plans intended for later execution, reports, handoffs, specifications, and other durable work artifacts in English unless the user explicitly requests another language.
+- Keep code, identifiers, commands, paths, schemas, evidence records, and technical metadata in English.
+- Do not translate existing source-controlled product copy merely to enforce this rule; preserve the product's intended localization and scope.
+
 ## Sensitive Data Protocol
 - Treat project-specific intellectual property, internal architecture, business logic, and credentials as confidential by default.
 - Never promote project-specific confidential details into shared prompts.
