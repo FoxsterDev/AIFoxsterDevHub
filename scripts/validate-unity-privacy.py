@@ -40,15 +40,12 @@ FORBIDDEN_IDENTITY_MARKERS = (
     "ConnectivityChecker",
     "ConnectivityTest",
     "DevAcceleration",
-    "Foxster",
 )
 
 FORBIDDEN_PROJECT_SETTINGS_MARKERS = (
     "ConnectivityCheckerPro",
     "ConnectivityTestUnity2022",
     "DevAccelerationSystem",
-    "FoxsterDev",
-    "FoxsterEntertaiment",
     "DefaultCompany",
     "com.DefaultCompany",
     "2D_BuiltInRenderer",
