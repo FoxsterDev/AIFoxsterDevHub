@@ -27,28 +27,50 @@ ROOT_PREFIXES = (
     "scripts/validate-unity-privacy.py",
 )
 
-CHILD_MARKERS = (
-    "AGENTS.md",
-    "Agents.md",
-    "Harness/",
-    "harness/",
-    "routing_audit.py",
-    "init_ai_",
-    "generate_agents",
-    "generate-agents",
-    "agent-routers",
-    "sync_agent_routers",
-    "run_host_python_tests.sh",
-    "validate_routing",
-    "validate-routing",
-    "Modules/XUUnity/",
-)
+CHILD_PREFIXES = {
+    Path("AIRoot"): (
+        "AGENTS.md",
+        "Modules/XUUnity/",
+        "scripts/routing_audit.py",
+        "scripts/init_ai_",
+    ),
+    Path("ConnectivityCheckerPro"): (
+        "AGENTS.md",
+        "Harness/",
+        "scripts/generate-unified-harness-routers.sh",
+    ),
+    Path("DevAccelerationSystem"): (
+        "AGENTS.md",
+        "Docs/ai/unity-unified-harness-adapter.md",
+        "scripts/refresh_harness_routing.py",
+    ),
+    Path("AIRoot/Operations/XUUnityLightUnityMcp"): (
+        "AGENTS.md",
+        "docs/clients/AGENTS.md",
+    ),
+}
 
 
 def is_harness_path(repo: Path, path: str) -> bool:
     if repo == Path("."):
         return any(path == prefix or path.startswith(prefix) for prefix in ROOT_PREFIXES)
-    return any(marker in path for marker in CHILD_MARKERS)
+    prefixes = CHILD_PREFIXES.get(repo, ())
+    return path.endswith("/AGENTS.md") or any(path == prefix or path.startswith(prefix) for prefix in prefixes)
+
+
+def parse_porcelain_z(output: str) -> list[str]:
+    """Return destination paths from porcelain-v1 -z, including renames."""
+    fields = output.split("\0")
+    paths: list[str] = []
+    index = 0
+    while index < len(fields) and fields[index]:
+        entry = fields[index]
+        if len(entry) < 4:
+            raise ValueError(f"invalid git status entry: {entry!r}")
+        status = entry[:2]
+        paths.append(entry[3:])
+        index += 2 if "R" in status or "C" in status else 1
+    return paths
 
 
 def changed_harness_paths(root: Path) -> list[str]:
@@ -56,18 +78,15 @@ def changed_harness_paths(root: Path) -> list[str]:
     for repo in REPOS:
         repo_root = root / repo
         result = subprocess.run(
-            ["git", "status", "--porcelain=v1", "--untracked-files=all"],
+            ["git", "status", "--porcelain=v1", "-z", "--untracked-files=all"],
             cwd=repo_root,
             check=False,
             capture_output=True,
             text=True,
         )
         if result.returncode != 0:
-            continue
-        for line in result.stdout.splitlines():
-            path = line[3:]
-            if " -> " in path:
-                path = path.split(" -> ", 1)[1]
+            raise RuntimeError(f"git status failed in {repo}: {result.stderr.strip()}")
+        for path in parse_porcelain_z(result.stdout):
             if is_harness_path(repo, path):
                 changed.append(f"{repo}:{path}")
     return changed
@@ -75,7 +94,7 @@ def changed_harness_paths(root: Path) -> list[str]:
 
 def run_validation(root: Path) -> tuple[bool, str]:
     result = subprocess.run(
-        [sys.executable, str(root / "scripts/validate-unity-harness.py")],
+        [sys.executable, "-B", str(root / "scripts/validate-unity-harness.py")],
         cwd=root,
         check=False,
         capture_output=True,

@@ -23,6 +23,6 @@ optional_local_projects:
     tracked_release_proof: false
 
 warnings:
-  - "XUUnity Light Unity MCP consumers and nested gitlink target stable v0.3.62; keep package-source and consumer proof distinct."
-  - "Connectivity Sample2022 has an unavailable absolute package dependency and is not release-green."
-  - "Connectivity Unity 6000.3.3f1 is not installed; nearby editor patches are not substitutes."
+  - "XUUnity Light Unity MCP consumers must match the exact nested-gitlink tag, package metadata, and peeled commit; keep package-source and consumer proof distinct."
+  - "Connectivity Sample2022 remains an embedded-copy exception; its successful compile does not prove canonical-package consumption."
+  - "Connectivity Unity 6000.3 exact-editor proof remains bounded to the version recorded in ProjectSettings/ProjectVersion.txt; nearby patches are not substitutes."

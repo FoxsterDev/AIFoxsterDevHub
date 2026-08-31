@@ -1,0 +1,137 @@
+{
+  "schema_version": 2,
+  "results": [
+    {
+      "id": "UH-01-docs-only",
+      "evidence_mode": "deterministic-contract",
+      "lane": "docs",
+      "proofs": ["diff-review", "static"],
+      "ceiling": "static",
+      "verdict": "pass",
+      "outcome_count": 0,
+      "claims_device_behavior": false,
+      "claims_release_ready": false
+    },
+    {
+      "id": "UH-02-contained-csharp",
+      "evidence_mode": "deterministic-contract",
+      "lane": "ordinary",
+      "proofs": ["exact-version", "compile", "editmode-focused"],
+      "ceiling": "editmode",
+      "verdict": "pass",
+      "outcome_count": 0,
+      "claims_device_behavior": false,
+      "claims_release_ready": false
+    },
+    {
+      "id": "UH-03-package-consumer",
+      "evidence_mode": "deterministic-contract",
+      "lane": "ordinary",
+      "proofs": ["package-source", "consumer-resolve", "consumer-compile"],
+      "ceiling": "compiled",
+      "verdict": "pass",
+      "outcome_count": 1,
+      "claims_device_behavior": false,
+      "claims_release_ready": false
+    },
+    {
+      "id": "UH-04-serialized-scene",
+      "evidence_mode": "deterministic-contract",
+      "lane": "high-risk",
+      "proofs": ["serialized-diff", "compile", "reopen", "playmode-focused"],
+      "ceiling": "serialized-reopen",
+      "verdict": "pass",
+      "outcome_count": 1,
+      "claims_device_behavior": false,
+      "claims_release_ready": false
+    },
+    {
+      "id": "UH-05-save-compatibility",
+      "evidence_mode": "deterministic-contract",
+      "lane": "high-risk",
+      "proofs": ["versioned-fixtures", "migration-idempotence", "rollback", "compatibility-matrix"],
+      "ceiling": "playmode",
+      "verdict": "pass",
+      "outcome_count": 1,
+      "claims_device_behavior": false,
+      "claims_release_ready": false
+    },
+    {
+      "id": "UH-06-native-device-only",
+      "evidence_mode": "deterministic-contract",
+      "lane": "high-risk",
+      "proofs": ["platform-build", "device-unavailable-recorded"],
+      "ceiling": "platform-build",
+      "verdict": "partial",
+      "outcome_count": 1,
+      "claims_device_behavior": false,
+      "claims_release_ready": false
+    },
+    {
+      "id": "UH-07-unity-version-matrix",
+      "evidence_mode": "deterministic-contract",
+      "lane": "release",
+      "proofs": ["exact-version-matrix", "build-target-recorded", "package-source", "consumer-compile"],
+      "ceiling": "release",
+      "verdict": "pass",
+      "outcome_count": 1,
+      "claims_device_behavior": false,
+      "claims_release_ready": true
+    },
+    {
+      "id": "UH-08-release-intentional-failure",
+      "evidence_mode": "historical-replay",
+      "lane": "release",
+      "proofs": ["mandatory-failure-recorded", "release-blocked"],
+      "ceiling": "compiled",
+      "verdict": "blocked",
+      "outcome_count": 1,
+      "claims_device_behavior": false,
+      "claims_release_ready": false
+    },
+    {
+      "id": "UH-09-tooling-version-contract",
+      "evidence_mode": "deterministic-contract",
+      "lane": "docs",
+      "proofs": ["gitlink-resolved", "exact-tag", "package-version", "consumer-pins", "supported-validator"],
+      "ceiling": "static",
+      "verdict": "pass",
+      "outcome_count": 1,
+      "claims_device_behavior": false,
+      "claims_release_ready": false,
+      "tooling_observation": {
+        "version_owner": "checked-in-gitlinks-package-metadata",
+        "validator_mode": "supported-semantic-contract",
+        "exact_tag": true,
+        "exact_commit": true,
+        "package_version_matches_tag": true,
+        "consumer_pins": [
+          {"id": "CCP-PUB", "exact_tag": true, "exact_hash": true},
+          {"id": "CCP-S21", "exact_tag": true, "exact_hash": true},
+          {"id": "CCP-S22", "exact_tag": true, "exact_hash": true},
+          {"id": "CCP-S60", "exact_tag": true, "exact_hash": true},
+          {"id": "CCP-S63", "exact_tag": true, "exact_hash": true},
+          {"id": "DAS-SRC", "exact_tag": true, "exact_hash": true},
+          {"id": "DAS-DEMO", "exact_tag": true, "exact_hash": true}
+        ]
+      }
+    },
+    {
+      "id": "UH-10-routing-compatibility",
+      "evidence_mode": "deterministic-contract",
+      "lane": "docs",
+      "proofs": ["semantic-standalone-detection", "unsupported-boundary-recorded", "release-boundary-preserved"],
+      "ceiling": "static",
+      "verdict": "pass",
+      "outcome_count": 1,
+      "claims_device_behavior": false,
+      "claims_release_ready": false,
+      "routing_observation": {
+        "standalone_detection": "semantic-mode-detection",
+        "unsupported_lane_status": "unsupported",
+        "release_supported": false,
+        "obsolete_generator_referenced": false
+      }
+    }
+  ]
+}

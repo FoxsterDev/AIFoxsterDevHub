@@ -26,7 +26,7 @@ routed_operation_projects:
   - path: AIRoot/Operations/XUUnityLightUnityMcp
     kind: public_unity_mcp_tooling
     router: AIRoot/Operations/XUUnityLightUnityMcp/AGENTS.md
-    status: active_stable_v0_3_62
+    status: active_exact_gitlink_release
     child_routes:
       - path: AIRoot/Operations/XUUnityLightUnityMcp/docs/clients
         router: AIRoot/Operations/XUUnityLightUnityMcp/docs/clients/AGENTS.md
