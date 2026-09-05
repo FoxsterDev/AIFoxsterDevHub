@@ -23,5 +23,9 @@ Updated: 2026-09-05
   corrections and returned REVISE because the live consumer proof is missing.
   The immutable upstream v0.3.72 STATUS mismatch and two `.meta` whitespace
   advisories remain recorded for a later upstream release.
+- An explicit cleanup follow-up preserved the seven previously dirty CCP
+  Marketing paths in a separate commit and committed the isolated DAS
+  `.editorconfig` line-ending snapshot; neither change was discarded or mixed
+  into a Harness implementation commit.
 - Detailed outcome:
   `AIOutput/Harness/validation-evidence-2026-09-02.md`.

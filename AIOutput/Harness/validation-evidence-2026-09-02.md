@@ -31,12 +31,12 @@ five v4 fingerprints after this outcome commit exists.
 
 ## Git Boundaries And Pins
 
-| Boundary | Isolated base | Task implementation head before this outcome | Parent-pin decision |
+| Boundary | Isolated base | Task/follow-up head represented by this outcome | Parent-pin decision |
 | --- | --- | --- | --- |
 | Hub root | `878f4e6d3ddfea1647330a63c5dfe1bdfd02fe14` | `d1d4b831d7d1a3e69d2449691b929ecd9ea5fcd2` | Root status-only outcome commit follows; its exact SHA is reported externally because a commit cannot contain its own SHA. |
 | AIRoot | `86e86d64975fedccb195e0a21ea6ff2c340b62a7` | `517493efeca711def648d18aecaf6882ed8de313` | Root pin advanced exactly from base to child head. |
 | ConnectivityCheckerPro | `8cc785f94be6558169f48b91840efe37b0466d90` | `c8559e81df493d1f740d834d2a7908dcae4a541c` | Root pin advanced exactly from base to child head. |
-| DevAccelerationSystem | `ca99e6932cbda965463753fc3c75c162b571c07b` | `bd43ad20cf259a137180fc97f520d07672d4c56f` | Root pin advanced exactly from base to child head. |
+| DevAccelerationSystem | `ca99e6932cbda965463753fc3c75c162b571c07b` | `ebea7cb98fdd77556c8529eacc9f9d05b895faa2` | Root pin advanced to the Harness head and then to the owner-authorized `.editorconfig` line-ending snapshot. |
 | XUUnity Light Unity MCP | `a72c79b675311583827ef5c9e966279555e64261` (`v0.3.63`) | `facc2081ab19d1fe4ab3adfd048e1385575aca70` (`v0.3.72`) | AIRoot pin advanced to the latest stable annotated release after explicit owner authorization. |
 
 Task-owned child commits:
@@ -45,8 +45,9 @@ Task-owned child commits:
   `517493efeca711def648d18aecaf6882ed8de313`.
 - ConnectivityCheckerPro: `c9dfcb44fd2ed6a2ed2c7f18b84cac0159df5442`
   and `c8559e81df493d1f740d834d2a7908dcae4a541c`.
-- DevAccelerationSystem: `feecdaa4757d20b2f4d22a6e2c7d33ed360086c6`
-  and `bd43ad20cf259a137180fc97f520d07672d4c56f`.
+- DevAccelerationSystem: `feecdaa4757d20b2f4d22a6e2c7d33ed360086c6`,
+  `bd43ad20cf259a137180fc97f520d07672d4c56f`, and the explicit follow-up
+  snapshot `ebea7cb98fdd77556c8529eacc9f9d05b895faa2`.
 - Hub implementation range: `878f4e6d3ddfea1647330a63c5dfe1bdfd02fe14..d1d4b831d7d1a3e69d2449691b929ecd9ea5fcd2`
   (ten commits, followed only by this outcome/handoff commit).
 
@@ -54,7 +55,7 @@ Imported gitlink ranges are exactly:
 
 - AIRoot: `86e86d64975fedccb195e0a21ea6ff2c340b62a7..517493efeca711def648d18aecaf6882ed8de313`;
 - ConnectivityCheckerPro: `8cc785f94be6558169f48b91840efe37b0466d90..c8559e81df493d1f740d834d2a7908dcae4a541c`;
-- DevAccelerationSystem: `ca99e6932cbda965463753fc3c75c162b571c07b..bd43ad20cf259a137180fc97f520d07672d4c56f`;
+- DevAccelerationSystem: `ca99e6932cbda965463753fc3c75c162b571c07b..ebea7cb98fdd77556c8529eacc9f9d05b895faa2`;
 - MCP: `a72c79b675311583827ef5c9e966279555e64261..facc2081ab19d1fe4ab3adfd048e1385575aca70`.
 
 The MCP range contains 21 commits and 165 changed paths (`+9355/-534`): eight
@@ -244,15 +245,15 @@ Required owner sequence:
 
 ## Dirty Partition And Rollback
 
-The user's active root checkout remains at
-`835e78c8c9800c274fdb87bf079c62969ccb6a98` on `main`, with only its pre-existing
-modified AIRoot and ConnectivityCheckerPro gitlinks. The active CCP checkout
-remains on `codex/connectivity-checker-pro-post-approval-marketing` at
-`0e9cf31ae83bec4a60ba8b70b27d55fabce56deb`; its seven pre-existing Marketing
-changes were not read into, staged with, or modified by this task. Active
-AIRoot, DAS, and MCP checkouts remained clean. The isolated DAS worktree retains
-its unrelated unstaged `DevAccelerationSystem.DemoProject/.editorconfig`
-line-ending difference; it was never staged. No user dirty path was absorbed.
+Before the explicit cleanup follow-up, the user's active root checkout was at
+`835e78c8c9800c274fdb87bf079c62969ccb6a98` with modified AIRoot and CCP
+gitlinks. The seven pre-existing CCP Marketing changes were then preserved on
+`codex/connectivity-checker-pro-post-approval-marketing` in commit
+`81832ab7e6145a913a9a59b0ce4a8b2b292478eb`; they are not part of the Harness
+gitlink scope. The isolated DAS `.editorconfig` mixed-line-ending difference
+was likewise preserved, at the owner's request, in
+`ebea7cb98fdd77556c8529eacc9f9d05b895faa2`. No dirty path was discarded or
+silently folded into a different commit.
 
 If Hub consumer proof finds an MCP regression, rollback should be a new set of
 child commits: restore all seven consumer pins to their previous common
