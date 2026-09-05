@@ -19,10 +19,10 @@ DAS_DEMO_GUID="{54014667-7B86-40E9-9C1F-74D157AC30DA}"
 DAS_WORKSPACES_GUID="{7D8C0D2A-BE39-4AF8-9272-52B085B78E84}"
 
 PROJECT_SPECS=(
-  "ConnectivityCheckerPro/Authoring|ConnectivityCheckerPro/ConnectivityCheckerPro_Publish/ConnectivityCheckerPro.Runtime.csproj"
-  "ConnectivityCheckerPro/Authoring|ConnectivityCheckerPro/ConnectivityCheckerPro_Publish/ConnectivityCheckerPro.Samples.csproj"
-  "ConnectivityCheckerPro/Authoring|ConnectivityCheckerPro/ConnectivityCheckerPro_Publish/ConnectivityCheckerPro.Tests.csproj"
-  "ConnectivityCheckerPro/Authoring|ConnectivityCheckerPro/ConnectivityCheckerPro_Publish/ConnectivityCheckerPro.PlayMode.Tests.csproj"
+  "ConnectivityCheckerPro/Authoring|ConnectivityCheckerPro/CCP_PUB/ConnectivityCheckerPro.Runtime.csproj"
+  "ConnectivityCheckerPro/Authoring|ConnectivityCheckerPro/CCP_PUB/ConnectivityCheckerPro.Samples.csproj"
+  "ConnectivityCheckerPro/Authoring|ConnectivityCheckerPro/CCP_PUB/ConnectivityCheckerPro.Tests.csproj"
+  "ConnectivityCheckerPro/Authoring|ConnectivityCheckerPro/CCP_PUB/ConnectivityCheckerPro.PlayMode.Tests.csproj"
   "DevAccelerationSystem/Authoring|DevAccelerationSystem/DevAccelerationSystem/DevAccelerationSystem.Core.csproj"
   "DevAccelerationSystem/Authoring|DevAccelerationSystem/DevAccelerationSystem/DevAccelerationSystem.ProjectCompilationCheck.csproj"
   "DevAccelerationSystem/Authoring|DevAccelerationSystem/DevAccelerationSystem/DevAccelerationSystem.Editor.Tests.csproj"
@@ -44,14 +44,14 @@ AIROOT_ITEMS=(
 )
 
 CCP_WORKSPACE_ITEMS=(
-  "ConnectivityCheckerPro/ConnectivityCheckerPro_Publish/ConnectivityCheckerPro_Publish.sln"
-  "ConnectivityCheckerPro/ConnectivityCheckerPro_Publish/Assets/ConnectivityCheckerPro/package.json"
-  "ConnectivityCheckerPro/ConnectivityCheckerPro_Sample2021/Packages/manifest.json"
-  "ConnectivityCheckerPro/ConnectivityCheckerPro_Sample2022/Packages/manifest.json"
-  "ConnectivityCheckerPro/ConnectivityCheckerPro_Sample6000/ConnectivityCheckerPro_Sample6000.sln"
-  "ConnectivityCheckerPro/ConnectivityCheckerPro_Sample6000/Packages/manifest.json"
-  "ConnectivityCheckerPro/ConnectivityCheckerPro_Sample6000_3_2f1/ConnectivityCheckerPro_Sample6000_3_2f1.sln"
-  "ConnectivityCheckerPro/ConnectivityCheckerPro_Sample6000_3_2f1/Packages/manifest.json"
+  "ConnectivityCheckerPro/CCP_PUB/CCP_PUB.sln"
+  "ConnectivityCheckerPro/CCP_PUB/Assets/ConnectivityCheckerPro/package.json"
+  "ConnectivityCheckerPro/CCP_S21/Packages/manifest.json"
+  "ConnectivityCheckerPro/CCP_S22/Packages/manifest.json"
+  "ConnectivityCheckerPro/CCP_S60/CCP_S60.sln"
+  "ConnectivityCheckerPro/CCP_S60/Packages/manifest.json"
+  "ConnectivityCheckerPro/CCP_S63/CCP_S63.sln"
+  "ConnectivityCheckerPro/CCP_S63/Packages/manifest.json"
 )
 
 DAS_WORKSPACE_ITEMS=(

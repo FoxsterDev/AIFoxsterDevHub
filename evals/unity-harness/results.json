@@ -120,7 +120,7 @@
       "id": "UH-10-routing-compatibility",
       "evidence_mode": "deterministic-contract",
       "lane": "docs",
-      "proofs": ["semantic-standalone-detection", "unsupported-boundary-recorded", "release-boundary-preserved"],
+      "proofs": ["semantic-standalone-detection", "unsupported-boundary-recorded", "release-boundary-preserved", "trigger-bound-maintenance"],
       "ceiling": "static",
       "verdict": "pass",
       "outcome_count": 1,
@@ -130,7 +130,8 @@
         "standalone_detection": "semantic-mode-detection",
         "unsupported_lane_status": "unsupported",
         "release_supported": false,
-        "obsolete_generator_referenced": false
+        "obsolete_generator_referenced": false,
+        "maintenance_trigger": "named-policy-trigger-required"
       }
     }
   ]

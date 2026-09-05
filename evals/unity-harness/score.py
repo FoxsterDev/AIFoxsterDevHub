@@ -13,7 +13,7 @@ from typing import Any, Callable
 SCHEMA_VERSION = 2
 EXPECTED_CASE_COUNT = 10
 EXPECTED_CONSUMER_COUNT = 7
-EXPECTATIONS_SHA256 = "6a6a7b83428aae15a225361243ef44029e9b8fa45236393df78824e586101b78"
+EXPECTATIONS_SHA256 = "e0bf812b4cd471f03e782dda0a7d6a2b3aeab55fe0b771b66fe24f6416e08024"
 REQUIRED_CASE_IDS = (
     "UH-01-docs-only", "UH-02-contained-csharp", "UH-03-package-consumer",
     "UH-04-serialized-scene", "UH-05-save-compatibility", "UH-06-native-device-only",
@@ -114,9 +114,12 @@ def _tooling_contract(value: Any, label: str, observation: bool) -> None:
 def _routing_contract(value: Any, label: str) -> None:
     if not isinstance(value, dict):
         raise ContractError(f"{label}: expected object")
-    keys = {"standalone_detection", "unsupported_lane_status", "release_supported", "obsolete_generator_referenced"}
+    keys = {
+        "standalone_detection", "unsupported_lane_status", "release_supported",
+        "obsolete_generator_referenced", "maintenance_trigger",
+    }
     _exact_keys(value, keys, label)
-    for field in ("standalone_detection", "unsupported_lane_status"):
+    for field in ("standalone_detection", "unsupported_lane_status", "maintenance_trigger"):
         if not isinstance(value[field], str) or not value[field]:
             raise ContractError(f"{label}.{field}: expected string")
     for field in ("release_supported", "obsolete_generator_referenced"):
@@ -266,6 +269,7 @@ def self_test(expectations_path: Path, results_path: Path) -> int:
         ("stale-pin", lambda d: d["results"][8]["tooling_observation"]["consumer_pins"][0].update({"exact_tag": False})),
         ("obsolete-generator", lambda d: d["results"][8]["tooling_observation"].update({"validator_mode": "obsolete-generator"})),
         ("brittle-standalone", lambda d: d["results"][9]["routing_observation"].update({"standalone_detection": "literal-Standalone-colon"})),
+        ("calendar-only-audit", lambda d: d["results"][9]["routing_observation"].update({"maintenance_trigger": "calendar-date"})),
         ("historical-relabel", lambda d: d["results"][7].update({"evidence_mode": "live-observation"})),
     ]
     rejected: list[str] = []

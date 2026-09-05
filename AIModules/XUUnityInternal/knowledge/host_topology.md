@@ -6,6 +6,7 @@ Use this file when project selection, ownership, or canonical-source routing mat
 
 ## Hub Shape
 - Repo root solution: `AIFoxsterDevHub.sln`
+- Machine-readable topology owner: `AIOutput/Registry/host_topology.yaml`
 - Public protocol core: `AIRoot/Modules/XUUnity/`
 - Host-local overlay: `AIModules/XUUnityInternal/`
 - Three nested git repos or tracked submodules:
@@ -16,13 +17,15 @@ Use this file when project selection, ownership, or canonical-source routing mat
   - `AIRoot/Operations/XUUnityLightUnityMcp/`
 
 ## ConnectivityCheckerPro Map
-- Canonical source project: `ConnectivityCheckerPro/ConnectivityCheckerPro_Publish/`
+- Canonical source project: `ConnectivityCheckerPro/CCP_PUB/`
 - Consumer validation projects:
-  - `ConnectivityCheckerPro/ConnectivityCheckerPro_Sample2021/`
-  - `ConnectivityCheckerPro/ConnectivityCheckerPro_Sample6000/`
-  - `ConnectivityCheckerPro/ConnectivityCheckerPro_Sample6000_3_2f1/`
-- Embedded-copy exception:
-  - `ConnectivityCheckerPro/ConnectivityCheckerPro_Sample2022/`
+  - `ConnectivityCheckerPro/CCP_S21/` (unsupported legacy evidence only)
+  - `ConnectivityCheckerPro/CCP_S22/`
+  - `ConnectivityCheckerPro/CCP_S60/`
+  - `ConnectivityCheckerPro/CCP_S63/`
+
+All tracked consumers use local `file:` package dependencies. `CCP_S22` also
+uses the shared validation package; it is not an embedded-copy exception.
 
 ## DevAccelerationSystem Map
 - Canonical source project: `DevAccelerationSystem/DevAccelerationSystem/`

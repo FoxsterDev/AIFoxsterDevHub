@@ -156,6 +156,11 @@ class FrozenScorerTests(unittest.TestCase):
         data["results"][9]["routing_observation"]["release_supported"] = True
         self.assert_rejected(results=data)
 
+    def test_calendar_only_generic_audit_is_rejected(self):
+        data = copy.deepcopy(self.results)
+        data["results"][9]["routing_observation"]["maintenance_trigger"] = "calendar-date"
+        self.assert_rejected(results=data)
+
     def test_nested_unknown_field_is_rejected(self):
         data = copy.deepcopy(self.results)
         data["results"][8]["tooling_observation"]["legacy_counter"] = 7

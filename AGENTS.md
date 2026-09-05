@@ -23,9 +23,11 @@ Use it to select shared prompt families, define load order, and route project-lo
 
 ## Routing Table
 - Use `xuunity` as the default protocol for Unity implementation, review, refactoring, product-facing implementation explanation, SDK work, native work, runtime safety, startup, performance, and compliance.
+- After a runtime implementation, use `AIRoot/Modules/XUUnity/reviews/post_implementation_impact_review.md` as the compact final pass; load broader XUUnity review/delivery files only for a named risk trigger.
 - Use host-local protocol families only when the host intentionally attaches them under `AIModules/`.
 - For tasks under `AIRoot/Operations/XUUnityLightUnityMcp/`, route to its child-owned exact `AIRoot/Operations/XUUnityLightUnityMcp/AGENTS.md` before project-specific work. This independently versioned tooling satellite remains standalone-capable; the host only augments it when available.
 - For tasks under `AIRoot/Operations/XUUnityLightUnityMcp/docs/clients/`, route through the MCP project router first, then the local client-docs router in that folder.
+- Resolve active projects and Git boundaries from `AIOutput/Registry/host_topology.yaml`. Run `python3 scripts/validate-unity-privacy.py --require-host-opt-out` immediately before any Unity launch; a red host check blocks Unity, not static routing work.
 
 ## Fast Shortcuts
 - `xuunity fix this bug`

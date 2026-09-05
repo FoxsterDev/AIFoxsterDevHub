@@ -4,23 +4,26 @@
 
 Use the hub solution for package authoring:
 
-- `ConnectivityCheckerPro/ConnectivityCheckerPro_Publish`
+- `ConnectivityCheckerPro/CCP_PUB`
 - `DevAccelerationSystem/DevAccelerationSystem`
 
 These are the canonical sources. Changes there apply to the consumer workspaces that already use local `file:` package dependencies:
 
-- `ConnectivityCheckerPro_Sample2021`
-- `ConnectivityCheckerPro_Sample6000`
-- `ConnectivityCheckerPro_Sample6000_3_2f1`
+- `ConnectivityCheckerPro/CCP_S21`
+- `ConnectivityCheckerPro/CCP_S22`
+- `ConnectivityCheckerPro/CCP_S60`
+- `ConnectivityCheckerPro/CCP_S63`
 - `DevAccelerationSystem.DemoProject`
 - `DAS.LocalProject` when present as an optional local-only validation workspace
 
-`ConnectivityCheckerPro_Sample2022` is the exception. It currently contains its own embedded `Assets/ConnectivityCheckerPro` copy and is not auto-synced from `ConnectivityCheckerPro_Publish`.
+All tracked Connectivity consumers use local `file:` dependencies on the
+canonical package in `ConnectivityCheckerPro/CCP_PUB`; `CCP_S22` also consumes
+the shared validation package. None is an embedded-copy exception.
 
 Recommended workflow:
 
 1. Open `AIFoxsterDevHub.sln` for package code, tests, manifests, and child workspace entry points.
-2. Edit canonical package code in `ConnectivityCheckerPro_Publish` or `DevAccelerationSystem`.
+2. Edit canonical package code in `ConnectivityCheckerPro/CCP_PUB` or `DevAccelerationSystem/DevAccelerationSystem`.
 3. Open a child Unity workspace only when you need to run scenes, package validation, or Unity-specific compilation in that consumer project.
 4. Run `scripts/refresh-aifoxster-hub.sh` if you add/remove authored `asmdef` projects and want the root solution refreshed.
 

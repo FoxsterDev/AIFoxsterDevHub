@@ -7,7 +7,7 @@ Use this file when deciding where code should be edited and where the result sho
 ## Authoring Path
 - Start package authoring from `AIFoxsterDevHub.sln`.
 - Edit shared package code in:
-  - `ConnectivityCheckerPro/ConnectivityCheckerPro_Publish/`
+  - `ConnectivityCheckerPro/CCP_PUB/`
   - `DevAccelerationSystem/DevAccelerationSystem/`
 
 ## Validation Path
@@ -16,10 +16,10 @@ Use this file when deciding where code should be edited and where the result sho
 - If a bug is version-specific, choose the consumer project on that engine branch instead of a generic sample.
 
 ## ConnectivityCheckerPro Guidance
-- Shared package fixes start in `ConnectivityCheckerPro_Publish/`.
-- Use `ConnectivityCheckerPro_Sample2021/` for older-engine validation.
+- Shared package fixes start in `CCP_PUB/`.
+- Use `CCP_S21/` only for unsupported older-engine evidence.
 - Use one of the Unity 6000 samples for current-line validation.
-- Use `ConnectivityCheckerPro_Sample2022/` only when the issue depends on its embedded copy or local sample setup.
+- Use `CCP_S22/` for minimum-supported-line local-package validation.
 
 ## DevAccelerationSystem Guidance
 - Shared package fixes start in `DevAccelerationSystem/`.

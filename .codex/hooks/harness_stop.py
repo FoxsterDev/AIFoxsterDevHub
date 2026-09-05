@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Codex Stop hook scoped to Harness-owned routing and configuration paths."""
+"""Fail-open Stop hook for the bounded, static Unity Harness contract."""
 
 from __future__ import annotations
 
@@ -9,57 +9,90 @@ import sys
 from pathlib import Path
 
 
-REPOS = (
-    Path("."),
-    Path("AIRoot"),
-    Path("ConnectivityCheckerPro"),
-    Path("DevAccelerationSystem"),
-    Path("AIRoot/Operations/XUUnityLightUnityMcp"),
-)
-
 ROOT_PREFIXES = (
-    ".codex/",
+    ".codex/hooks.json",
+    ".codex/hooks/",
+    ".gitmodules",
     "AGENTS.md",
-    "Agents.md",
+    "AIFoxsterDevHub.sln",
+    "WORKSPACE.md",
     "AIOutput/Harness/",
+    "AIOutput/Registry/host_topology.yaml",
+    "AIOutput/Registry/setup_status.yaml",
+    "AIModules/XUUnityInternal/start_session.md",
+    "AIModules/XUUnityInternal/knowledge/host_topology.md",
+    "AIModules/XUUnityInternal/knowledge/validation_paths.md",
     "evals/unity-harness/",
+    "scripts/refresh-aifoxster-hub.sh",
+    "scripts/unity_harness_contract.py",
+    "scripts/unity_harness_review.py",
     "scripts/validate-unity-harness.py",
     "scripts/validate-unity-privacy.py",
+    "scripts/test_unity_harness",
 )
 
-CHILD_PREFIXES = {
-    Path("AIRoot"): (
-        "AGENTS.md",
-        "Modules/XUUnity/",
-        "scripts/routing_audit.py",
-        "scripts/init_ai_",
-    ),
-    Path("ConnectivityCheckerPro"): (
-        "AGENTS.md",
-        "Harness/",
-        "scripts/generate-unified-harness-routers.sh",
-    ),
-    Path("DevAccelerationSystem"): (
-        "AGENTS.md",
-        "Docs/ai/unity-unified-harness-adapter.md",
-        "scripts/refresh_harness_routing.py",
-    ),
-    Path("AIRoot/Operations/XUUnityLightUnityMcp"): (
-        "AGENTS.md",
-        "docs/clients/AGENTS.md",
-    ),
-}
+
+def _relative_to_boundary(global_path: str, boundary_path: str) -> str | None:
+    prefix = boundary_path.rstrip("/") + "/"
+    if global_path == boundary_path:
+        return "."
+    if global_path.startswith(prefix):
+        return global_path[len(prefix):]
+    return None
 
 
-def is_harness_path(repo: Path, path: str) -> bool:
+def configured_paths(root: Path) -> tuple[dict[Path, tuple[str, ...]], tuple[str, ...]]:
+    """Derive active child-owned trigger paths and parent gitlinks from topology."""
+    scripts = str(root / "scripts")
+    if scripts not in sys.path:
+        sys.path.insert(0, scripts)
+    from unity_harness_contract import boundary_map, load_topology  # pylint: disable=import-outside-toplevel
+
+    topology = load_topology(root)
+    boundaries = boundary_map(topology)
+    child_paths: dict[Path, set[str]] = {}
+    root_gitlinks: list[str] = []
+    for identity, record in boundaries.items():
+        if identity == "root":
+            continue
+        boundary = Path(record["path"])
+        child_paths.setdefault(boundary, set())
+        if record["parent"] == "root":
+            root_gitlinks.append(record["gitlink"])
+        elif record["parent"] in boundaries:
+            parent_path = Path(boundaries[record["parent"]]["path"])
+            child_paths.setdefault(parent_path, set()).add(record["gitlink"])
+        for field in ("router", "kernel", "adapter", "generator"):
+            target = record[field]
+            if target == "none":
+                continue
+            relative = _relative_to_boundary(target, record["path"])
+            if relative and relative != ".":
+                child_paths[boundary].add(relative)
+    for project in topology["projects"]:
+        boundary_record = boundaries[project["git_boundary"]]
+        boundary = Path(boundary_record["path"])
+        relative = _relative_to_boundary(project["router"], boundary_record["path"])
+        if relative:
+            child_paths.setdefault(boundary, set()).add(relative)
+    return (
+        {repo: tuple(sorted(paths)) for repo, paths in child_paths.items()},
+        tuple(sorted(root_gitlinks)),
+    )
+
+
+def _matches(path: str, prefixes: tuple[str, ...]) -> bool:
+    return any(path == prefix or (prefix.endswith("/") and path.startswith(prefix)) or path.startswith(prefix) for prefix in prefixes)
+
+
+def is_harness_path(repo: Path, path: str, child_paths: dict[Path, tuple[str, ...]]) -> bool:
     if repo == Path("."):
-        return any(path == prefix or path.startswith(prefix) for prefix in ROOT_PREFIXES)
-    prefixes = CHILD_PREFIXES.get(repo, ())
-    return path.endswith("/AGENTS.md") or any(path == prefix or path.startswith(prefix) for prefix in prefixes)
+        return _matches(path, ROOT_PREFIXES)
+    return path in child_paths.get(repo, ())
 
 
 def parse_porcelain_z(output: str) -> list[str]:
-    """Return destination paths from porcelain-v1 -z, including renames."""
+    """Return both source and destination paths from porcelain-v1 -z."""
     fields = output.split("\0")
     paths: list[str] = []
     index = 0
@@ -69,17 +102,38 @@ def parse_porcelain_z(output: str) -> list[str]:
             raise ValueError(f"invalid git status entry: {entry!r}")
         status = entry[:2]
         paths.append(entry[3:])
-        index += 2 if "R" in status or "C" in status else 1
+        if "R" in status or "C" in status:
+            if index + 1 >= len(fields) or not fields[index + 1]:
+                raise ValueError("rename/copy status is missing its source path")
+            paths.append(fields[index + 1])
+            index += 2
+        else:
+            index += 1
     return paths
 
 
+def _gitlink_pointer_changed(root: Path, path: str) -> bool:
+    for cached in (False, True):
+        command = ["git", "diff", "--quiet", "--ignore-submodules=dirty"]
+        if cached:
+            command.append("--cached")
+        command.extend(("--", path))
+        result = subprocess.run(command, cwd=root, check=False, capture_output=True, text=True)
+        if result.returncode == 1:
+            return True
+        if result.returncode not in {0, 1}:
+            raise RuntimeError(f"git diff failed for {path}: {result.stderr.strip()}")
+    return False
+
+
 def changed_harness_paths(root: Path) -> list[str]:
+    child_paths, root_gitlinks = configured_paths(root)
+    repositories = (Path("."), *sorted(child_paths, key=lambda value: value.as_posix()))
     changed: list[str] = []
-    for repo in REPOS:
-        repo_root = root / repo
+    for repo in repositories:
         result = subprocess.run(
             ["git", "status", "--porcelain=v1", "-z", "--untracked-files=all"],
-            cwd=repo_root,
+            cwd=root / repo,
             check=False,
             capture_output=True,
             text=True,
@@ -87,23 +141,27 @@ def changed_harness_paths(root: Path) -> list[str]:
         if result.returncode != 0:
             raise RuntimeError(f"git status failed in {repo}: {result.stderr.strip()}")
         for path in parse_porcelain_z(result.stdout):
-            if is_harness_path(repo, path):
+            if repo == Path(".") and path in root_gitlinks:
+                if _gitlink_pointer_changed(root, path):
+                    changed.append(f"{repo}:{path}")
+                continue
+            if is_harness_path(repo, path, child_paths):
                 changed.append(f"{repo}:{path}")
-    return changed
+    return sorted(set(changed))
 
 
 def run_validation(root: Path) -> tuple[bool, str]:
     result = subprocess.run(
-        [sys.executable, "-B", str(root / "scripts/validate-unity-harness.py")],
+        [sys.executable, "-B", str(root / "scripts/validate-unity-harness.py"), "--stop"],
         cwd=root,
         check=False,
         capture_output=True,
         text=True,
-        timeout=25,
+        timeout=50,
     )
     output = (result.stdout + result.stderr).strip()
-    if len(output) > 1800:
-        output = output[-1800:]
+    if len(output) > 2_400:
+        output = output[-2_400:]
     return result.returncode == 0, output
 
 
@@ -118,17 +176,23 @@ def decision(payload: dict, root: Path) -> dict:
         return {}
     return {
         "decision": "block",
-        "reason": "Unity Harness routing/config validation is red. Fix only the reported Harness surface; do not run product regressions from this Stop gate.\n" + output,
+        "reason": (
+            "Unity Harness static routing/configuration validation is red. "
+            "Fix only the reported Harness surface; this gate never runs Unity or product regressions.\n"
+            + output
+        ),
     }
 
 
 def main() -> int:
     try:
         payload = json.load(sys.stdin)
-        root = Path(subprocess.check_output(["git", "rev-parse", "--show-toplevel"], text=True).strip())
+        root = Path(
+            subprocess.check_output(["git", "rev-parse", "--show-toplevel"], text=True).strip()
+        )
         print(json.dumps(decision(payload, root)))
         return 0
-    except Exception as error:  # Fail open so a hook implementation fault cannot trap ordinary work.
+    except Exception as error:  # Fail open so hook faults cannot trap ordinary work.
         print(json.dumps({"systemMessage": f"Unity Harness Stop hook could not run: {error}"}))
         return 0
 

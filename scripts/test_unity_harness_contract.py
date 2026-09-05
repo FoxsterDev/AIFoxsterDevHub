@@ -3,16 +3,22 @@
 
 from __future__ import annotations
 
+import copy
 import json
 import tempfile
 import unittest
 from pathlib import Path
+from unittest import mock
 
 from unity_harness_contract import (
     DuplicateKeyError,
+    assess_budget,
+    duplicate_semantic_sections,
+    load_topology,
     load_json,
     select_release_tag,
     validate_consumer_pin,
+    validate_topology,
 )
 
 
@@ -21,6 +27,7 @@ EXPECTED_URL = (
     "?path=/packages/com.xuunity.light-mcp#v9.8.7"
 )
 EXPECTED_HASH = "a" * 40
+ROOT = Path(__file__).resolve().parents[1]
 
 
 class HarnessContractTests(unittest.TestCase):
@@ -69,6 +76,71 @@ class HarnessContractTests(unittest.TestCase):
         path.write_text('{"dependencies": {}, "dependencies": {}}', encoding="utf-8")
         with self.assertRaises(DuplicateKeyError):
             load_json(path)
+
+    def test_203_lines_under_byte_ceiling_warns_and_passes(self) -> None:
+        warnings, failures = assess_budget(
+            "connectivity-root", 203, 9_180,
+            line_min=None, line_max=200, byte_ceiling=10_000,
+        )
+        self.assertEqual(1, len(warnings))
+        self.assertEqual([], failures)
+
+    def test_byte_ceiling_overflow_remains_hard(self) -> None:
+        warnings, failures = assess_budget(
+            "connectivity-root", 199, 10_001,
+            line_min=None, line_max=200, byte_ceiling=10_000,
+        )
+        self.assertEqual([], warnings)
+        self.assertTrue(any("hard" in failure for failure in failures))
+
+    def test_exact_repeated_canonical_section_fails(self) -> None:
+        temporary = tempfile.TemporaryDirectory(prefix="unity-harness-sections-")
+        self.addCleanup(temporary.cleanup)
+        root = Path(temporary.name)
+        body = "same semantic owner " * 12
+        (root / "one.md").write_text(f"## Owner One\n\n{body}\n", encoding="utf-8")
+        (root / "two.md").write_text(f"## Owner Two\n\n{body}\n", encoding="utf-8")
+        errors = duplicate_semantic_sections(root, ("one.md", "two.md"))
+        self.assertTrue(any("exact repeated" in error for error in errors))
+
+    def test_current_topology_resolves_five_ccp_projects(self) -> None:
+        topology = load_topology(ROOT)
+        ccp = [
+            record for record in topology["projects"]
+            if record["git_boundary"] == "ConnectivityCheckerPro"
+        ]
+        self.assertEqual(5, len(ccp))
+        self.assertTrue(all(Path(record["path"]).name.startswith("CCP_") for record in ccp))
+
+    def test_wrong_role_or_denominator_fails_the_actual_validator(self) -> None:
+        topology = load_topology(ROOT)
+        wrong_role = copy.deepcopy(topology)
+        wrong_role["projects"][2]["role"] = "source"
+        with mock.patch("unity_harness_contract.load_topology", return_value=wrong_role):
+            _, errors = validate_topology(ROOT)
+        self.assertTrue(any("boundary/role" in error or "role denominator" in error for error in errors))
+
+        missing = copy.deepcopy(topology)
+        missing["projects"].pop()
+        with mock.patch("unity_harness_contract.load_topology", return_value=missing):
+            _, errors = validate_topology(ROOT)
+        self.assertTrue(any("denominator" in error for error in errors))
+
+    def test_missing_router_and_stale_long_form_path_fail(self) -> None:
+        topology = load_topology(ROOT)
+        missing_router = copy.deepcopy(topology)
+        missing_router["projects"][0]["router"] = "ConnectivityCheckerPro/CCP_PUB/NO_ROUTER.md"
+        with mock.patch("unity_harness_contract.load_topology", return_value=missing_router):
+            _, errors = validate_topology(ROOT)
+        self.assertTrue(any("router" in error for error in errors))
+
+        stale = copy.deepcopy(topology)
+        stale["projects"][2]["path"] = (
+            "ConnectivityCheckerPro/" + "ConnectivityCheckerPro_Sample2022"
+        )
+        with mock.patch("unity_harness_contract.load_topology", return_value=stale):
+            _, errors = validate_topology(ROOT)
+        self.assertTrue(any("CCP_*" in error or "missing" in error for error in errors))
 
 
 if __name__ == "__main__":

@@ -5,7 +5,7 @@
 [submodule "ConnectivityCheckerPro"]
 	path = ConnectivityCheckerPro
 	url = https://github.com/FoxsterDev/ConnectivityCheckerPro.git
-	branch = main
+	branch = master
 [submodule "DevAccelerationSystem"]
 	path = DevAccelerationSystem
 	url = https://github.com/FoxsterDev/DevAccelerationSystem.git

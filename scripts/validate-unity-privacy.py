@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Fail closed when Hub Unity projects can expose product identity or Cloud data."""
+"""Validate repository privacy separately from host Unity-launch authority."""
 
 from __future__ import annotations
 
@@ -7,18 +7,13 @@ import argparse
 import json
 import platform
 import subprocess
+import sys
 from pathlib import Path
 
+sys.dont_write_bytecode = True
 
-PROJECTS = {
-    "ConnectivityCheckerPro/ConnectivityCheckerPro_Publish": "CCP-PUB",
-    "ConnectivityCheckerPro/ConnectivityCheckerPro_Sample2021": "CCP-S21",
-    "ConnectivityCheckerPro/ConnectivityCheckerPro_Sample2022": "CCP-S22",
-    "ConnectivityCheckerPro/ConnectivityCheckerPro_Sample6000": "CCP-S60",
-    "ConnectivityCheckerPro/ConnectivityCheckerPro_Sample6000_3_2f1": "CCP-S63",
-    "DevAccelerationSystem/DevAccelerationSystem": "DAS-SRC",
-    "DevAccelerationSystem/DevAccelerationSystem.DemoProject": "DAS-DEMO",
-}
+from unity_harness_contract import EXPECTED_CONSUMER_COUNT, load_topology, project_records
+
 
 BANNED_PACKAGES = {
     "com.unity.analytics",
@@ -56,7 +51,7 @@ def scalar(text: str, key: str) -> str | None:
     prefix = f"  {key}:"
     for line in text.splitlines():
         if line.startswith(prefix):
-            return line[len(prefix) :].strip()
+            return line[len(prefix):].strip()
     return None
 
 
@@ -71,7 +66,6 @@ def check_project(root: Path, relative: str, codename: str) -> list[str]:
 
     player = player_path.read_text(encoding="utf-8")
     connect = connect_path.read_text(encoding="utf-8")
-
     expected_scalars = {
         "companyName": "FD",
         "productName": codename,
@@ -89,7 +83,7 @@ def check_project(root: Path, relative: str, codename: str) -> list[str]:
     if "  cloudServicesEnabled: {}" not in player:
         failures.append(f"{codename}: cloudServicesEnabled is not empty")
 
-    visible_lines = []
+    visible_lines: list[str] = []
     capture_identifiers = False
     for line in player.splitlines():
         stripped = line.strip()
@@ -133,8 +127,20 @@ def check_project(root: Path, relative: str, codename: str) -> list[str]:
         present = BANNED_PACKAGES.intersection(dependencies)
         if present:
             failures.append(f"{codename}: banned Unity Cloud packages present: {sorted(present)}")
-
     return failures
+
+
+def privacy_projects(root: Path) -> tuple[list[dict[str, str]], list[str]]:
+    try:
+        selected = project_records(load_topology(root), "privacy_check")
+    except (OSError, ValueError) as error:
+        return [], [f"privacy topology could not be resolved: {error}"]
+    failures: list[str] = []
+    if len(selected) != EXPECTED_CONSUMER_COUNT:
+        failures.append(
+            f"privacy project denominator is {len(selected)}, expected {EXPECTED_CONSUMER_COUNT}"
+        )
+    return selected, failures
 
 
 def check_editor_analytics() -> list[str]:
@@ -170,28 +176,44 @@ def check_hub_records(root: Path) -> list[str]:
     return failures
 
 
+def evaluate(root: Path, require_host_opt_out: bool) -> tuple[dict, int]:
+    projects, repository_failures = privacy_projects(root)
+    for record in projects:
+        repository_failures.extend(check_project(root, record["path"], record["id"]))
+
+    host_failures: list[str] = []
+    authority = "not-evaluated"
+    if require_host_opt_out:
+        host_failures.extend(check_editor_analytics())
+        host_failures.extend(check_hub_records(root))
+        authority = "blocked" if host_failures else "ready"
+
+    repository_status = "fail" if repository_failures else "pass"
+    overall_failures = repository_failures + host_failures
+    result = {
+        "status": "fail" if overall_failures else "pass",
+        "repository_privacy": {
+            "status": repository_status,
+            "projects_checked": len(projects),
+            "failures": repository_failures,
+        },
+        "unity_launch_authority": {
+            "status": authority,
+            "host_opt_out_checked": require_host_opt_out,
+            "failures": host_failures,
+        },
+    }
+    return result, 1 if overall_failures else 0
+
+
 def main() -> int:
     parser = argparse.ArgumentParser()
     parser.add_argument("--root", type=Path, default=Path(__file__).resolve().parents[1])
     parser.add_argument("--require-host-opt-out", action="store_true")
     args = parser.parse_args()
-
-    root = args.root.resolve()
-    failures = []
-    for relative, codename in PROJECTS.items():
-        failures.extend(check_project(root, relative, codename))
-    if args.require_host_opt_out:
-        failures.extend(check_editor_analytics())
-        failures.extend(check_hub_records(root))
-
-    result = {
-        "status": "fail" if failures else "pass",
-        "projects_checked": len(PROJECTS),
-        "host_opt_out_checked": args.require_host_opt_out,
-        "failures": failures,
-    }
+    result, code = evaluate(args.root.resolve(), args.require_host_opt_out)
     print(json.dumps(result, indent=2, sort_keys=True))
-    return 1 if failures else 0
+    return code
 
 
 if __name__ == "__main__":

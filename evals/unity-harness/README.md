@@ -18,11 +18,13 @@ Evidence modes are explicit:
 - `live-observation` is reserved for genuinely executed evidence and is not
   used by the frozen baseline.
 
-The ten cases retain the original eight behavior families, including the
+This is a `10/10 frozen policy self-consistency` check, not live product quality
+or Harness adoption evidence. The ten cases retain the original eight behavior families, including the
 blocked `UH-08` historical release invariant. `UH-09` covers exact MCP tooling,
 tag, hash, package version, validator, and seven consumer pins. `UH-10` covers
-semantic standalone detection and the unsupported compatibility lane without
-claiming release support.
+semantic standalone detection, the unsupported compatibility lane without
+claiming release support, and the named-trigger requirement for future generic
+Harness audits. Calendar time alone is not a maintenance trigger.
 
 Run the scorer, its built-in mutation check, and the tracked mutation suite:
 

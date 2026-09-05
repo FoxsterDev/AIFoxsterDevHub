@@ -1,131 +1,80 @@
 # Unity Unified Harness Kernel
 
-Status: active
-Owner: AIFoxsterDevHub
-Updated: 2026-08-29
+Status: active | Owner: AIFoxsterDevHub | Updated: 2026-09-02
 
-## Runtime shape
+## Shape And Ownership
 
-Use the native Codex host. This repository adds routing and proof policy, not an
-agent runtime or workflow engine:
+Use the native host; this is routing and proof policy, not a runtime, broker,
+queue, daemon, or task store:
 
-`native host -> this compact kernel -> satellite adapter -> XUUnity when needed -> focused proof -> zero or one outcome record`
+`native host -> compact kernel -> nearest standalone adapter -> conditional Unity guidance -> focused proof -> zero or one outcome`
 
-Load only the layers required by the current path:
-
-1. exact `AGENTS.md` files from repository root to the working directory;
-2. this kernel when a Hub checkout is available;
-3. the nearest satellite adapter;
-4. `AIRoot/Modules/XUUnity/` only for Unity implementation or validation work;
-5. project memory and prior reports only when directly relevant.
-
-`AIModules/XUUnityInternal/` is an optional Hub overlay. A satellite must remain
-truthful and usable when the Hub, AIRoot, or that overlay is absent.
-
-The nested XUUnity Light Unity MCP repository is the active Unity execution
-satellite. Consumers and the AIRoot gitlink use the same verified stable
-release. Its existing launcher, smoke tests, and version matrix are reused;
-the Harness does not wrap them in a replacement broker or process hierarchy.
-
-## Active boundaries
-
-- `AIRoot/`: shared XUUnity protocol and repository setup generators.
-- `ConnectivityCheckerPro/`: one package source plus five versioned consumers.
-- `DevAccelerationSystem/`: package source plus tracked demo consumer.
-- `AIRoot/Operations/XUUnityLightUnityMcp/`: independently versioned public MCP
-  tooling satellite with its own exact router and standalone fallback.
-- `AIModules/`: optional host-local overlay; never a satellite dependency.
-
-`AIRoot/Operations/XUUnityAiCliOrchestrator/` is historical tooling and is not a
-Harness runtime. The nested MCP project is independently active; host routing
-augments it without taking over its runtime, sessions, or release ownership.
-
-## Privacy preflight
-
-Before any Unity launch in this Hub, run:
-
-```sh
-python3 scripts/validate-unity-privacy.py --require-host-opt-out
-```
-
-The command must prove neutral Unity-visible identities, disabled Editor and
-project Analytics, empty Unity Cloud identity, disabled Unity services, and no
-explicit Analytics/Collab packages. A red result forbids Unity launch but does
-not block docs or ordinary non-Unity repository work.
-
-For a requested clean regeneration, delete only the target Unity project's
-`Library/` after resolving the exact project root from
-`ProjectSettings/ProjectVersion.txt`; never broaden cleanup to `Assets/`,
-`Packages/`, `ProjectSettings/`, or a satellite root.
+Load the root and nearest `AGENTS.md`, this kernel, and the selected adapter.
+Load project memory only for the target. Satellites work without the Hub or
+private overlay. Public Unity rules belong in `AIRoot/Modules/XUUnity/`; the
+topology owner is `AIOutput/Registry/host_topology.yaml`.
 
 ## Lanes
 
-| Lane | Typical change | Minimum truthful proof |
+| Lane | Trigger | Minimum truthful route |
 | --- | --- | --- |
-| docs | prose, router wording, frozen data | diff review plus the narrow static validator |
-| ordinary | contained C# or package change | exact-version resolve/compile and the smallest relevant EditMode or PlayMode set |
-| high-risk | serialized assets, lifecycle, save/migration, native integration | ordinary proof plus reopen/reload or fixture/migration/device evidence matching the risk |
-| release | release intent, package publication, support claim | source proof, consumer proof, required version/build-target matrix, clean release inputs, and no unresolved mandatory failure |
+| docs | prose, routing, frozen data | exact diff plus narrow static owner |
+| ordinary | contained code or package wiring | exact-version resolve/compile plus focused test |
+| high-risk | lifecycle, serialization, migration, native, permissions | ordinary proof plus the matching transition, fixture, build, or device boundary |
+| release | version, support, distribution, readiness claim | clean source and consumer proof plus every claimed matrix/platform gate |
 
-Escalate the lane when evidence shows higher risk. Never lower it to match the
-available machine.
+Escalate on higher risk; never lower a lane to fit the machine. Package-source and consumer proof are distinct.
 
-## Unity proof routing
+## Final Impact Route
 
-- Package source and consumer validation are distinct. A green package test is
-  not consumer proof; a consumer compile is not package self-test proof.
-- Record exact Unity editor version and active build target. A nearby installed
-  patch version does not prove the requested version.
-- `asmdef` or C# changes require a real Unity compile ceiling. Text search or
-  IDE compilation alone is below that ceiling.
-- EditMode proves editor/test-domain behavior. PlayMode proves runtime behavior.
-  Neither substitutes for the other.
-- Scene, prefab, ScriptableObject, and other serialized changes require YAML or
-  Inspector review plus reopen/reload proof appropriate to the change. Never
-  normalize or rewrite unrelated serialized content.
-- Domain reload, editor startup/shutdown, delayed callbacks, and play-mode
-  transition claims require the matching lifecycle transition.
-- Save/data migrations require versioned fixtures, backup/rollback behavior,
-  idempotence, corrupt/partial-data handling, and compatibility evidence.
-- Addressables and content catalogs require catalog/profile/build/load proof;
-  an asset-database compile is insufficient.
-- Native SDK and permission changes require platform build evidence. Runtime,
-  permission-prompt, sensor, store, or hardware claims remain device-only until
-  exercised on a real supported device.
+After runtime implementation, load
+`AIRoot/Modules/XUUnity/reviews/post_implementation_impact_review.md` for the
+default final pass. Load broader delivery, policy, platform, full-review, or
+release guidance only when that card names a concrete trigger.
 
-## Journey Zero and proof ceilings
+## Proof And Claims
 
-Journey Zero is the smallest path that can falsify the change before broader
-work. Start with static/privacy/resolve evidence, then compile, then the narrow
-test or lifecycle slice. Broaden only after the previous step is green.
+Start with the smallest falsifying static/resolve check, then compile, focused
+EditMode or PlayMode, lifecycle/reopen, platform build, and physical device only
+as required. Record exact Unity version and build target. A helper test proves
+only its helper unless decisive proof crosses the real orchestration boundary.
 
-Report the strongest completed proof and its ceiling. Valid ceiling labels are:
+Strongest ceiling labels are `static`, `resolved`, `compiled`, `editmode`,
+`playmode`, `serialized-reopen`, `platform-build`, `physical-device`, and
+`release`. Missing versions, licenses, targets, devices, or baseline health stay
+explicit; they never become passing claims.
 
-- `static`
-- `resolved`
-- `compiled`
-- `editmode`
-- `playmode`
-- `serialized-reopen`
-- `platform-build`
-- `physical-device`
-- `release`
+## Privacy And Launch Authority
 
-Do not translate missing Unity versions, unavailable build modules, blocked
-licenses, absent devices, or baseline failures into a passing claim.
+`python3 scripts/validate-unity-privacy.py` owns deterministic repository
+privacy structure. Immediately before Unity, add `--require-host-opt-out` to
+check host Editor/Hub launch authority. A red host result forbids Unity and its
+claims, but does not falsify docs-only topology or static Harness checks. Never
+change host preferences or Hub records without explicit owner authorization.
 
-## Outcome discipline
+## Outcome And Independent Acceptance
 
-Most turns produce no durable outcome record. Create at most one when a
-decision, release block, migration result, or reusable failure boundary must be
-handed off. It must include lane, source/consumer boundary, exact version and
-target, commands/evidence, strongest ceiling, known baseline failures, and next
-owner action. Do not create event streams, task databases, queues, or session
-state for this kernel.
+Most turns write no durable outcome; write at most one when a reusable decision
+or blocker must be handed off. Every final implementation/review handoff begins:
 
-## Stop gate
+```text
+Readiness: <designed|implemented-unverified|owner-QA-ready|release-ready>
+Independent acceptance: <pending|PASS|REVISE|not-required>
+Accept as complete: <yes|no>
+Next required action: <action|none>
+```
 
-The repository Stop hook is scoped to Harness-owned routing/configuration
-changes. It runs only static router, privacy-contract, and frozen-eval checks;
-it never launches Unity or product regressions and no-ops for ordinary product
-development. Hook trust remains an explicit owner action through `/hooks`.
+High-risk authors cannot self-certify. PASS or REVISE comes only from a fresh
+non-author review bound to each repository, full base commit, sorted scoped
+paths, and SHA-256 of exact current content. In-scope mutation invalidates it;
+unrelated dirt does not. Pending or REVISE is never ready/complete. PASS cannot
+erase a missing Unity, consumer, platform, device, owner, or release gate.
+
+## Finish And Maintenance
+
+The scoped Stop hook is static-only, bounded, owner-trusted, fail-open on faults,
+and a no-op for product/generated/build/log/marketing paths; it never runs Unity.
+
+Open another generic audit only after a demonstrated false-ready/route, the same
+gap in two natural tasks/repositories, a material scorer/contract change, a new
+satellite/project class, or an explicit release-owner request. Calendar time alone is not a trigger.

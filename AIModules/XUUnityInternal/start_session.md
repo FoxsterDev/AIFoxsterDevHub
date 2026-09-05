@@ -5,7 +5,7 @@ Apply host-local routing rules for `AIFoxsterDevHub` after the public `xuunity` 
 Use this file only when the current task is inside this hub and the host-specific workspace map affects implementation, review, or validation.
 
 ## Load Order
-1. Repo router at `Agents.md`
+1. Repo router at `AGENTS.md`
 2. Public core at `AIRoot/Modules/XUUnity/`
 3. This file
 4. Narrow host-local knowledge files from `knowledge/` using the trigger rules below
@@ -45,12 +45,12 @@ Use this file only when the current task is inside this hub and the host-specifi
 8. If the user asks for `commit all changes` or `push all changes` at the hub root, traverse every dirty submodule repo first, then return to the hub root for pointer updates and any remaining host-owned commits.
 
 ## Canonical Source Rules
-- `ConnectivityCheckerPro/ConnectivityCheckerPro_Publish/` is the canonical source for `ConnectivityCheckerPro`.
+- `ConnectivityCheckerPro/CCP_PUB/` is the canonical source for `ConnectivityCheckerPro`.
 - `DevAccelerationSystem/DevAccelerationSystem/` is the canonical source for `DevAccelerationSystem`.
 - Do not land durable shared package fixes in sample or demo projects unless the sample intentionally owns an embedded copy.
 
 ## Known Exception Rules
-- `ConnectivityCheckerPro/ConnectivityCheckerPro_Sample2022/` contains its own embedded `Assets/ConnectivityCheckerPro` copy and is not auto-synced from `ConnectivityCheckerPro_Publish/`.
+- `ConnectivityCheckerPro/CCP_S22/` is the minimum-supported tracked consumer and resolves the canonical package plus shared validation tooling through local `file:` dependencies.
 - `DevAccelerationSystem/DAS.LocalProject/` is an optional local-only validation workspace, may be absent, and is ignored by the nested repo's `.gitignore`.
 
 ## Validation Rules

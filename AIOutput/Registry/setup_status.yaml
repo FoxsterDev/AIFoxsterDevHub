@@ -8,21 +8,10 @@ overlay_root: AIModules/XUUnityInternal/
 report_scaffold_status: scaffolded
 project_memory_baseline_status: seeded_or_existing
 last_provisioned_at: "2026-08-30T01:55:56Z"
-routed_projects:
-  - ConnectivityCheckerPro/ConnectivityCheckerPro_Publish
-  - ConnectivityCheckerPro/ConnectivityCheckerPro_Sample2021
-  - ConnectivityCheckerPro/ConnectivityCheckerPro_Sample2022
-  - ConnectivityCheckerPro/ConnectivityCheckerPro_Sample6000
-  - ConnectivityCheckerPro/ConnectivityCheckerPro_Sample6000_3_2f1
-  - DevAccelerationSystem/DevAccelerationSystem
-  - DevAccelerationSystem/DevAccelerationSystem.DemoProject
-optional_local_projects:
-  - path: DevAccelerationSystem/DAS.LocalProject
-    kind: local_validation_consumer
-    status: optional_absent_ok
-    tracked_release_proof: false
+topology_source: AIOutput/Registry/host_topology.yaml
+topology_projection_status: current
 
 warnings:
   - "XUUnity Light Unity MCP consumers must match the exact nested-gitlink tag, package metadata, and peeled commit; keep package-source and consumer proof distinct."
-  - "Connectivity Sample2022 remains an embedded-copy exception; its successful compile does not prove canonical-package consumption."
-  - "Connectivity Unity 6000.3 exact-editor proof remains bounded to the version recorded in ProjectSettings/ProjectVersion.txt; nearby patches are not substitutes."
+  - "CCP_S22 is a local file-package consumer of CCP_PUB and shared validation tooling; it is not an embedded-copy exception."
+  - "CCP_S63 exact-editor proof is bounded to ProjectSettings/ProjectVersion.txt; nearby Unity patches are not substitutes."

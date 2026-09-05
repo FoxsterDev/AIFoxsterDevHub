@@ -1,32 +1,170 @@
+schema_version: 3
+topology_owner: AIOutput/Registry/host_topology.yaml
 profile_id: monorepo_overlay_default
 repo_mode: monorepo
 storage_profile: project-local
 router_mode: repo-and-project
 project_link_mode: direct
-solution_mode: none
+solution_mode: curated
 active_repo_router: AGENTS.md
 active_project_memory_root: <Project>/Assets/AIOutput/ProjectMemory/
 active_project_reports_root: <Project>/Assets/AIOutput/
 active_project_skill_overrides_root: <Project>/Assets/AIOutput/ProjectMemory/SkillOverrides/
 internal_overlay_root: AIModules/XUUnityInternal/
+
+git_boundaries:
+  - id: root
+    path: .
+    parent: none
+    gitlink: none
+    router: AGENTS.md
+    kernel: AIOutput/Harness/KERNEL.md
+    adapter: none
+    generator: scripts/validate-unity-harness.py
+    standalone: false
+  - id: AIRoot
+    path: AIRoot
+    parent: root
+    gitlink: AIRoot
+    router: AIRoot/AGENTS.md
+    kernel: none
+    adapter: AIRoot/Modules/XUUnity/reviews/post_implementation_impact_review.md
+    generator: none
+    standalone: true
+  - id: ConnectivityCheckerPro
+    path: ConnectivityCheckerPro
+    parent: root
+    gitlink: ConnectivityCheckerPro
+    router: ConnectivityCheckerPro/AGENTS.md
+    kernel: ConnectivityCheckerPro/Harness/README.md
+    adapter: ConnectivityCheckerPro/Harness/unity-adapter.md
+    generator: ConnectivityCheckerPro/scripts/generate-unified-harness-routers.sh
+    standalone: true
+  - id: DevAccelerationSystem
+    path: DevAccelerationSystem
+    parent: root
+    gitlink: DevAccelerationSystem
+    router: DevAccelerationSystem/AGENTS.md
+    kernel: none
+    adapter: DevAccelerationSystem/Docs/ai/unity-unified-harness-adapter.md
+    generator: DevAccelerationSystem/scripts/refresh_harness_routing.py
+    standalone: true
+  - id: MCP
+    path: AIRoot/Operations/XUUnityLightUnityMcp
+    parent: AIRoot
+    gitlink: Operations/XUUnityLightUnityMcp
+    router: AIRoot/Operations/XUUnityLightUnityMcp/AGENTS.md
+    kernel: none
+    adapter: AIRoot/Operations/XUUnityLightUnityMcp/docs/clients/AGENTS.md
+    generator: none
+    standalone: true
+
+project_contracts:
+  - id: CCP-PUB
+    path: ConnectivityCheckerPro/CCP_PUB
+    git_boundary: ConnectivityCheckerPro
+    role: source
+    project_kind: unity_native_package_source
+    router: ConnectivityCheckerPro/CCP_PUB/AGENTS.md
+    unity_version: 2022.3.62f3
+    mcp_consumer: true
+    privacy_check: true
+    standalone: true
+    release_proof: true
+    context_sample: false
+  - id: CCP-S21
+    path: ConnectivityCheckerPro/CCP_S21
+    git_boundary: ConnectivityCheckerPro
+    role: unsupported
+    project_kind: unity_unsupported_legacy_compatibility_lane
+    router: ConnectivityCheckerPro/CCP_S21/AGENTS.md
+    unity_version: 2021.3.45f2
+    mcp_consumer: true
+    privacy_check: true
+    standalone: true
+    release_proof: false
+    context_sample: false
+  - id: CCP-S22
+    path: ConnectivityCheckerPro/CCP_S22
+    git_boundary: ConnectivityCheckerPro
+    role: consumer
+    project_kind: unity_package_validation_consumer
+    router: ConnectivityCheckerPro/CCP_S22/AGENTS.md
+    unity_version: 2022.3.62f3
+    mcp_consumer: true
+    privacy_check: true
+    standalone: true
+    release_proof: true
+    context_sample: true
+  - id: CCP-S60
+    path: ConnectivityCheckerPro/CCP_S60
+    git_boundary: ConnectivityCheckerPro
+    role: consumer
+    project_kind: unity_package_validation_consumer
+    router: ConnectivityCheckerPro/CCP_S60/AGENTS.md
+    unity_version: 6000.0.58f2
+    mcp_consumer: true
+    privacy_check: true
+    standalone: true
+    release_proof: true
+    context_sample: false
+  - id: CCP-S63
+    path: ConnectivityCheckerPro/CCP_S63
+    git_boundary: ConnectivityCheckerPro
+    role: consumer
+    project_kind: unity_package_validation_consumer
+    router: ConnectivityCheckerPro/CCP_S63/AGENTS.md
+    unity_version: 6000.3.23f1
+    mcp_consumer: true
+    privacy_check: true
+    standalone: true
+    release_proof: true
+    context_sample: false
+  - id: DAS-SRC
+    path: DevAccelerationSystem/DevAccelerationSystem
+    git_boundary: DevAccelerationSystem
+    role: source
+    project_kind: unity_package_and_editor_tooling_source
+    router: DevAccelerationSystem/DevAccelerationSystem/AGENTS.md
+    unity_version: 2022.3.62f3
+    mcp_consumer: true
+    privacy_check: true
+    standalone: true
+    release_proof: true
+    context_sample: false
+  - id: DAS-DEMO
+    path: DevAccelerationSystem/DevAccelerationSystem.DemoProject
+    git_boundary: DevAccelerationSystem
+    role: demo
+    project_kind: unity_package_validation_demo
+    router: DevAccelerationSystem/DevAccelerationSystem.DemoProject/AGENTS.md
+    unity_version: 2022.3.62f3
+    mcp_consumer: true
+    privacy_check: true
+    standalone: true
+    release_proof: true
+    context_sample: true
+
+# Compatibility projection for the public AIRoot routing audit. It is validated
+# against project_contracts and is not an independent owner.
 routed_projects:
-  - ConnectivityCheckerPro/ConnectivityCheckerPro_Publish
-  - ConnectivityCheckerPro/ConnectivityCheckerPro_Sample2021
-  - ConnectivityCheckerPro/ConnectivityCheckerPro_Sample2022
-  - ConnectivityCheckerPro/ConnectivityCheckerPro_Sample6000
-  - ConnectivityCheckerPro/ConnectivityCheckerPro_Sample6000_3_2f1
+  - ConnectivityCheckerPro/CCP_PUB
+  - ConnectivityCheckerPro/CCP_S21
+  - ConnectivityCheckerPro/CCP_S22
+  - ConnectivityCheckerPro/CCP_S60
+  - ConnectivityCheckerPro/CCP_S63
   - DevAccelerationSystem/DevAccelerationSystem
   - DevAccelerationSystem/DevAccelerationSystem.DemoProject
+
 optional_local_projects:
   - path: DevAccelerationSystem/DAS.LocalProject
     kind: local_validation_consumer
     status: optional_absent_ok
     tracked_release_proof: false
+
 routed_operation_projects:
   - path: AIRoot/Operations/XUUnityLightUnityMcp
     kind: public_unity_mcp_tooling
     router: AIRoot/Operations/XUUnityLightUnityMcp/AGENTS.md
     status: active_exact_gitlink_release
-    child_routes:
-      - path: AIRoot/Operations/XUUnityLightUnityMcp/docs/clients
-        router: AIRoot/Operations/XUUnityLightUnityMcp/docs/clients/AGENTS.md
+    client_router: AIRoot/Operations/XUUnityLightUnityMcp/docs/clients/AGENTS.md

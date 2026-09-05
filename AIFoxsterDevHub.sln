@@ -21,14 +21,14 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Authoring", "Authoring", "{
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Workspaces", "Workspaces", "{D8E8B807-5E4D-4C8B-BE27-1476A9DB944B}"
 	ProjectSection(SolutionItems) = preProject
-		ConnectivityCheckerPro\ConnectivityCheckerPro_Publish\ConnectivityCheckerPro_Publish.sln = ConnectivityCheckerPro\ConnectivityCheckerPro_Publish\ConnectivityCheckerPro_Publish.sln
-		ConnectivityCheckerPro\ConnectivityCheckerPro_Publish\Assets\ConnectivityCheckerPro\package.json = ConnectivityCheckerPro\ConnectivityCheckerPro_Publish\Assets\ConnectivityCheckerPro\package.json
-		ConnectivityCheckerPro\ConnectivityCheckerPro_Sample2021\Packages\manifest.json = ConnectivityCheckerPro\ConnectivityCheckerPro_Sample2021\Packages\manifest.json
-		ConnectivityCheckerPro\ConnectivityCheckerPro_Sample2022\Packages\manifest.json = ConnectivityCheckerPro\ConnectivityCheckerPro_Sample2022\Packages\manifest.json
-		ConnectivityCheckerPro\ConnectivityCheckerPro_Sample6000\ConnectivityCheckerPro_Sample6000.sln = ConnectivityCheckerPro\ConnectivityCheckerPro_Sample6000\ConnectivityCheckerPro_Sample6000.sln
-		ConnectivityCheckerPro\ConnectivityCheckerPro_Sample6000\Packages\manifest.json = ConnectivityCheckerPro\ConnectivityCheckerPro_Sample6000\Packages\manifest.json
-		ConnectivityCheckerPro\ConnectivityCheckerPro_Sample6000_3_2f1\ConnectivityCheckerPro_Sample6000_3_2f1.sln = ConnectivityCheckerPro\ConnectivityCheckerPro_Sample6000_3_2f1\ConnectivityCheckerPro_Sample6000_3_2f1.sln
-		ConnectivityCheckerPro\ConnectivityCheckerPro_Sample6000_3_2f1\Packages\manifest.json = ConnectivityCheckerPro\ConnectivityCheckerPro_Sample6000_3_2f1\Packages\manifest.json
+		ConnectivityCheckerPro\CCP_PUB\CCP_PUB.sln = ConnectivityCheckerPro\CCP_PUB\CCP_PUB.sln
+		ConnectivityCheckerPro\CCP_PUB\Assets\ConnectivityCheckerPro\package.json = ConnectivityCheckerPro\CCP_PUB\Assets\ConnectivityCheckerPro\package.json
+		ConnectivityCheckerPro\CCP_S21\Packages\manifest.json = ConnectivityCheckerPro\CCP_S21\Packages\manifest.json
+		ConnectivityCheckerPro\CCP_S22\Packages\manifest.json = ConnectivityCheckerPro\CCP_S22\Packages\manifest.json
+		ConnectivityCheckerPro\CCP_S60\CCP_S60.sln = ConnectivityCheckerPro\CCP_S60\CCP_S60.sln
+		ConnectivityCheckerPro\CCP_S60\Packages\manifest.json = ConnectivityCheckerPro\CCP_S60\Packages\manifest.json
+		ConnectivityCheckerPro\CCP_S63\CCP_S63.sln = ConnectivityCheckerPro\CCP_S63\CCP_S63.sln
+		ConnectivityCheckerPro\CCP_S63\Packages\manifest.json = ConnectivityCheckerPro\CCP_S63\Packages\manifest.json
 	EndProjectSection
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "DevAccelerationSystem", "DevAccelerationSystem", "{1E7A85AE-0909-4A12-B129-49B4F3E89E61}"
@@ -50,13 +50,13 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Workspaces", "Workspaces", 
 		DevAccelerationSystem\DAS.LocalProject\Packages\manifest.json = DevAccelerationSystem\DAS.LocalProject\Packages\manifest.json
 	EndProjectSection
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ConnectivityCheckerPro.Runtime", "ConnectivityCheckerPro\ConnectivityCheckerPro_Publish\ConnectivityCheckerPro.Runtime.csproj", "{C36AB83C-AC7E-33C3-EB13-4E6EFEFD194D}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ConnectivityCheckerPro.Runtime", "ConnectivityCheckerPro\CCP_PUB\ConnectivityCheckerPro.Runtime.csproj", "{C36AB83C-AC7E-33C3-EB13-4E6EFEFD194D}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ConnectivityCheckerPro.Samples", "ConnectivityCheckerPro\ConnectivityCheckerPro_Publish\ConnectivityCheckerPro.Samples.csproj", "{FD6A30E9-4F06-75FC-F58D-DD082FB702E4}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ConnectivityCheckerPro.Samples", "ConnectivityCheckerPro\CCP_PUB\ConnectivityCheckerPro.Samples.csproj", "{FD6A30E9-4F06-75FC-F58D-DD082FB702E4}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ConnectivityCheckerPro.Tests", "ConnectivityCheckerPro\ConnectivityCheckerPro_Publish\ConnectivityCheckerPro.Tests.csproj", "{D186AEED-334D-F388-DC13-976A34E9DB9A}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ConnectivityCheckerPro.Tests", "ConnectivityCheckerPro\CCP_PUB\ConnectivityCheckerPro.Tests.csproj", "{D186AEED-334D-F388-DC13-976A34E9DB9A}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ConnectivityCheckerPro.PlayMode.Tests", "ConnectivityCheckerPro\ConnectivityCheckerPro_Publish\ConnectivityCheckerPro.PlayMode.Tests.csproj", "{58E4F0C7-D1EF-D419-6B7E-5BED245426E7}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ConnectivityCheckerPro.PlayMode.Tests", "ConnectivityCheckerPro\CCP_PUB\ConnectivityCheckerPro.PlayMode.Tests.csproj", "{58E4F0C7-D1EF-D419-6B7E-5BED245426E7}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DevAccelerationSystem.Core", "DevAccelerationSystem\DevAccelerationSystem\DevAccelerationSystem.Core.csproj", "{0B1044ED-2A33-7E72-F82F-698FC1E0D5B4}"
 EndProject
