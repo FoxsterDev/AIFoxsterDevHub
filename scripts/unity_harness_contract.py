@@ -4,6 +4,7 @@
 from __future__ import annotations
 
 import json
+import os
 import re
 import subprocess
 from collections import Counter
@@ -54,6 +55,13 @@ DOCUMENT_BUDGETS = {
         None,
         160,
         8_192,
+    ),
+}
+
+ROUTE_TARGETS = {
+    "KERNEL.md": "AIOutput/Harness/KERNEL.md",
+    "post_implementation_impact_review.md": (
+        "AIRoot/Modules/XUUnity/reviews/post_implementation_impact_review.md"
     ),
 }
 
@@ -611,9 +619,13 @@ def route_contract_failures(root: Path, topology: dict[str, Any]) -> list[str]:
         "ConnectivityCheckerPro": ("KERNEL.md", "post_implementation_impact_review.md", "standalone", "fallback"),
         "DevAccelerationSystem": ("KERNEL.md", "post_implementation_impact_review.md", "standalone", "fallback"),
     }
+    route_files: list[tuple[str, str]] = [("root", "AGENTS.md")]
     for identity, markers in requirements.items():
         record = boundaries.get(identity, {})
         paths = [record.get("router", ""), record.get("adapter", "")]
+        route_files.extend(
+            (identity, path) for path in paths if path and path != "none"
+        )
         text = "\n".join(
             (root / path).read_text(encoding="utf-8")
             for path in paths if path and path != "none" and (root / path).is_file()
@@ -624,6 +636,21 @@ def route_contract_failures(root: Path, topology: dict[str, Any]) -> list[str]:
     root_router = (root / "AGENTS.md").read_text(encoding="utf-8") if (root / "AGENTS.md").is_file() else ""
     if "post_implementation_impact_review.md" not in root_router:
         failures.append("root router does not route the compact runtime final pass")
+    for identity, relative in sorted(set(route_files)):
+        source = root / relative
+        if not source.is_file():
+            continue
+        for advertised in re.findall(r"`([^`\n]+)`", source.read_text(encoding="utf-8")):
+            for suffix, expected_relative in ROUTE_TARGETS.items():
+                if not advertised.endswith(suffix):
+                    continue
+                actual = Path(os.path.normpath(str(source.parent / advertised)))
+                expected = Path(os.path.normpath(str(root / expected_relative)))
+                if actual != expected or not expected.is_file():
+                    failures.append(
+                        f"{identity}: advertised route {advertised!r} from {relative} "
+                        f"does not resolve to {expected_relative}"
+                    )
     return failures
 
 

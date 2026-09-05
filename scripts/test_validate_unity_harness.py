@@ -68,6 +68,53 @@ class RootGateContractTests(unittest.TestCase):
         errors = unity_harness_contract.route_contract_failures(root, topology)
         self.assertTrue(any("fallback" in error for error in errors))
 
+    def test_advertised_hub_route_resolves_from_the_advertising_file(self) -> None:
+        temporary = tempfile.TemporaryDirectory(prefix="unity-harness-route-target-")
+        self.addCleanup(temporary.cleanup)
+        root = Path(temporary.name)
+        (root / "AIOutput/Harness").mkdir(parents=True)
+        (root / "AIOutput/Harness/KERNEL.md").write_text("kernel\n", encoding="utf-8")
+        impact = root / "AIRoot/Modules/XUUnity/reviews/post_implementation_impact_review.md"
+        impact.parent.mkdir(parents=True)
+        impact.write_text("impact\n", encoding="utf-8")
+        adapter = root / "DevAccelerationSystem/Docs/ai/adapter.md"
+        adapter.parent.mkdir(parents=True)
+        adapter.write_text(
+            "KERNEL.md post_implementation_impact_review.md standalone fallback\n"
+            "`../../AIOutput/Harness/KERNEL.md`\n"
+            "`../../AIRoot/Modules/XUUnity/reviews/post_implementation_impact_review.md`\n",
+            encoding="utf-8",
+        )
+        router = root / "DevAccelerationSystem/AGENTS.md"
+        router.write_text(
+            "KERNEL.md post_implementation_impact_review.md standalone fallback\n",
+            encoding="utf-8",
+        )
+        (root / "AGENTS.md").write_text(
+            "post_implementation_impact_review.md\n", encoding="utf-8"
+        )
+        topology = {
+            "boundaries": [
+                {
+                    "id": "DevAccelerationSystem",
+                    "router": "DevAccelerationSystem/AGENTS.md",
+                    "adapter": "DevAccelerationSystem/Docs/ai/adapter.md",
+                }
+            ]
+        }
+
+        errors = unity_harness_contract.route_contract_failures(root, topology)
+        self.assertTrue(any("advertised route" in error for error in errors))
+
+        adapter.write_text(
+            "KERNEL.md post_implementation_impact_review.md standalone fallback\n"
+            "`../../../AIOutput/Harness/KERNEL.md`\n"
+            "`../../../AIRoot/Modules/XUUnity/reviews/post_implementation_impact_review.md`\n",
+            encoding="utf-8",
+        )
+        errors = unity_harness_contract.route_contract_failures(root, topology)
+        self.assertFalse(any("advertised route" in error for error in errors))
+
 
 if __name__ == "__main__":
     unittest.main()
