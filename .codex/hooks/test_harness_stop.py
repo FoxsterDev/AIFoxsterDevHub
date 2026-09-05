@@ -85,6 +85,16 @@ class HarnessStopTests(unittest.TestCase):
             )
         )
 
+    def test_root_file_triggers_do_not_match_lookalike_paths(self) -> None:
+        self.assertFalse(
+            harness_stop.is_harness_path(Path("."), "AGENTS.md.backup", self.child_paths)
+        )
+        self.assertFalse(
+            harness_stop.is_harness_path(
+                Path("."), "scripts/validate-unity-harness.py.old", self.child_paths
+            )
+        )
+
     def test_current_topology_discovers_all_active_adapters(self) -> None:
         paths, root_gitlinks = harness_stop.configured_paths(ROOT)
         self.assertEqual(

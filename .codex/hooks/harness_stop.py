@@ -82,7 +82,10 @@ def configured_paths(root: Path) -> tuple[dict[Path, tuple[str, ...]], tuple[str
 
 
 def _matches(path: str, prefixes: tuple[str, ...]) -> bool:
-    return any(path == prefix or (prefix.endswith("/") and path.startswith(prefix)) or path.startswith(prefix) for prefix in prefixes)
+    return any(
+        path == prefix or (prefix.endswith("/") and path.startswith(prefix))
+        for prefix in prefixes
+    )
 
 
 def is_harness_path(repo: Path, path: str, child_paths: dict[Path, tuple[str, ...]]) -> bool:

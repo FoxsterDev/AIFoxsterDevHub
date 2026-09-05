@@ -65,6 +65,7 @@ STOP_LABELS = {
     "privacy-structure",
     "frozen-eval-tests",
     "frozen-policy-self-consistency",
+    "stop-hook-tests",
     "current-contract-mutations",
     "routing-audit",
     "connectivity-router-generator",
