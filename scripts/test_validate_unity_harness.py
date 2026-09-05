@@ -43,10 +43,19 @@ class RootGateContractTests(unittest.TestCase):
         self.addCleanup(temporary.cleanup)
         root = Path(temporary.name)
         topology = {"boundaries": []}
-        common = "KERNEL.md post_implementation_impact_review.md standalone fallback\n"
+        common = (
+            "standalone fallback\n"
+            "`../AIOutput/Harness/KERNEL.md`\n"
+            "`../AIRoot/Modules/XUUnity/reviews/post_implementation_impact_review.md`\n"
+        )
+        (root / "AIOutput/Harness").mkdir(parents=True)
+        (root / "AIOutput/Harness/KERNEL.md").write_text("kernel\n", encoding="utf-8")
+        impact = root / "AIRoot/Modules/XUUnity/reviews/post_implementation_impact_review.md"
+        impact.parent.mkdir(parents=True)
+        impact.write_text("impact\n", encoding="utf-8")
         for identity in ("AIRoot", "ConnectivityCheckerPro", "DevAccelerationSystem"):
             directory = root / identity
-            directory.mkdir(parents=True)
+            directory.mkdir(parents=True, exist_ok=True)
             router = directory / "AGENTS.md"
             adapter = directory / "adapter.md"
             router.write_text(common, encoding="utf-8")
@@ -54,23 +63,27 @@ class RootGateContractTests(unittest.TestCase):
             topology["boundaries"].append(
                 {"id": identity, "router": f"{identity}/AGENTS.md", "adapter": f"{identity}/adapter.md"}
             )
-        (root / "AGENTS.md").write_text("post_implementation_impact_review.md\n", encoding="utf-8")
+        (root / "AGENTS.md").write_text(
+            "`AIRoot/Modules/XUUnity/reviews/post_implementation_impact_review.md`\n",
+            encoding="utf-8",
+        )
         self.assertEqual([], unity_harness_contract.route_contract_failures(root, topology))
 
-        target = root / "ConnectivityCheckerPro/AGENTS.md"
-        target.write_text(common.replace("KERNEL.md", ""), encoding="utf-8")
-        (root / "ConnectivityCheckerPro/adapter.md").write_text(
-            common.replace("KERNEL.md", ""), encoding="utf-8"
+        target = root / "ConnectivityCheckerPro/adapter.md"
+        target.write_text(
+            common.replace("`../AIOutput/Harness/KERNEL.md`\n", ""), encoding="utf-8"
         )
         errors = unity_harness_contract.route_contract_failures(root, topology)
-        self.assertTrue(any("KERNEL.md" in error for error in errors))
+        self.assertTrue(
+            any("ConnectivityCheckerPro adapter" in error and "KERNEL.md" in error for error in errors)
+        )
+        self.assertTrue(any("missing advertised target" in error for error in errors))
 
         target.write_text(common.replace("fallback", ""), encoding="utf-8")
-        (root / "ConnectivityCheckerPro/adapter.md").write_text(
-            common.replace("fallback", ""), encoding="utf-8"
-        )
         errors = unity_harness_contract.route_contract_failures(root, topology)
-        self.assertTrue(any("fallback" in error for error in errors))
+        self.assertTrue(
+            any("ConnectivityCheckerPro adapter" in error and "fallback" in error for error in errors)
+        )
 
     def test_advertised_hub_route_resolves_from_the_advertising_file(self) -> None:
         temporary = tempfile.TemporaryDirectory(prefix="unity-harness-route-target-")
@@ -91,11 +104,14 @@ class RootGateContractTests(unittest.TestCase):
         )
         router = root / "DevAccelerationSystem/AGENTS.md"
         router.write_text(
-            "KERNEL.md post_implementation_impact_review.md standalone fallback\n",
+            "standalone fallback\n"
+            "`../AIOutput/Harness/KERNEL.md`\n"
+            "`../AIRoot/Modules/XUUnity/reviews/post_implementation_impact_review.md`\n",
             encoding="utf-8",
         )
         (root / "AGENTS.md").write_text(
-            "post_implementation_impact_review.md\n", encoding="utf-8"
+            "`AIRoot/Modules/XUUnity/reviews/post_implementation_impact_review.md`\n",
+            encoding="utf-8",
         )
         topology = {
             "boundaries": [

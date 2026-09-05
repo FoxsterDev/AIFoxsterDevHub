@@ -177,6 +177,30 @@ class HarnessReviewTests(unittest.TestCase):
         )
         self.assertTrue(any("omits child gitlink" in error for error in errors))
 
+    def test_parent_gitlink_index_mutation_invalidates_fingerprint(self) -> None:
+        parent, parent_base = self.make_repo("gitlink-parent")
+        child, child_head = self.make_repo("gitlink-child")
+        (parent / "child-link").symlink_to(child, target_is_directory=True)
+        git(
+            parent,
+            "update-index",
+            "--add",
+            "--cacheinfo",
+            f"160000,{child_head},child-link",
+        )
+        scope = self.scope("root", parent, parent_base, ["child-link"])
+        record = self.record([scope])
+        self.assertEqual(validate_outcome(record, lane="high-risk"), [])
+
+        git(
+            parent,
+            "update-index",
+            "--cacheinfo",
+            f"160000,{'1' * 40},child-link",
+        )
+        errors = validate_outcome(record, lane="high-risk")
+        self.assertTrue(any("fingerprint" in error for error in errors))
+
     def test_outcome_block_must_start_at_line_one(self) -> None:
         repo, base = self.make_repo()
         scope = self.scope("root", repo, base, ["tracked.txt"])

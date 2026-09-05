@@ -166,7 +166,7 @@ def scope_fingerprint(repo: Path, base: str, paths: list[str] | tuple[str, ...])
         raise ValueError("; ".join(errors))
 
     hasher = hashlib.sha256()
-    _feed(hasher, b"unity-harness-review-scope-v2")
+    _feed(hasher, b"unity-harness-review-scope-v3")
     _feed(hasher, base_oid.encode())
     for relative in normalized:
         candidate = repo / relative
@@ -181,16 +181,28 @@ def scope_fingerprint(repo: Path, base: str, paths: list[str] | tuple[str, ...])
             raise ValueError(f"review path is absent now and at base: {relative!r}")
         _feed(hasher, relative.encode())
         if index_entry and index_entry[0] == "160000":
-            child_oid = index_entry[1]
-            if candidate.exists():
-                child = subprocess.run(
-                    ["git", "-C", str(candidate), "rev-parse", "HEAD"],
-                    text=True, capture_output=True, check=False,
-                )
-                if child.returncode == 0:
-                    child_oid = child.stdout.strip()
             _feed(hasher, b"gitlink")
-            _feed(hasher, child_oid.encode())
+            _feed(hasher, index_entry[1].encode())
+            if not exists_now:
+                _feed(hasher, b"checkout-absent")
+                continue
+            child_top = subprocess.run(
+                ["git", "-C", str(candidate), "rev-parse", "--show-toplevel"],
+                text=True, capture_output=True, check=False,
+            )
+            child_head = subprocess.run(
+                ["git", "-C", str(candidate), "rev-parse", "HEAD"],
+                text=True, capture_output=True, check=False,
+            )
+            if (
+                child_top.returncode == 0
+                and child_head.returncode == 0
+                and Path(child_top.stdout.strip()).resolve() == candidate.resolve()
+            ):
+                _feed(hasher, b"checkout-head")
+                _feed(hasher, child_head.stdout.strip().encode())
+            else:
+                _feed(hasher, b"checkout-unavailable")
             continue
         if not exists_now:
             _feed(hasher, b"deleted")

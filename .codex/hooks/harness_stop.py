@@ -132,25 +132,34 @@ def _gitlink_pointer_changed(root: Path, path: str) -> bool:
     return False
 
 
+def _status_paths(repository: Path) -> list[str]:
+    result = subprocess.run(
+        ["git", "status", "--porcelain=v1", "-z", "--untracked-files=all"],
+        cwd=repository,
+        check=False,
+        capture_output=True,
+        text=True,
+    )
+    if result.returncode != 0:
+        raise RuntimeError(f"git status failed in {repository}: {result.stderr.strip()}")
+    return parse_porcelain_z(result.stdout)
+
+
 def changed_harness_paths(root: Path) -> list[str]:
+    root_status_paths = _status_paths(root)
+    fixed_root_changes = sorted(
+        {f".:{path}" for path in root_status_paths if _matches(path, ROOT_PREFIXES)}
+    )
+    if fixed_root_changes:
+        return fixed_root_changes
+
     child_paths, root_gitlinks = configured_paths(root)
-    repositories = (Path("."), *sorted(child_paths, key=lambda value: value.as_posix()))
     changed: list[str] = []
-    for repo in repositories:
-        result = subprocess.run(
-            ["git", "status", "--porcelain=v1", "-z", "--untracked-files=all"],
-            cwd=root / repo,
-            check=False,
-            capture_output=True,
-            text=True,
-        )
-        if result.returncode != 0:
-            raise RuntimeError(f"git status failed in {repo}: {result.stderr.strip()}")
-        for path in parse_porcelain_z(result.stdout):
-            if repo == Path(".") and path in root_gitlinks:
-                if _gitlink_pointer_changed(root, path):
-                    changed.append(f"{repo}:{path}")
-                continue
+    for path in root_status_paths:
+        if path in root_gitlinks and _gitlink_pointer_changed(root, path):
+            changed.append(f".:{path}")
+    for repo in sorted(child_paths, key=lambda value: value.as_posix()):
+        for path in _status_paths(root / repo):
             if is_harness_path(repo, path, child_paths):
                 changed.append(f"{repo}:{path}")
     return sorted(set(changed))

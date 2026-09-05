@@ -5,6 +5,8 @@ from __future__ import annotations
 
 import io
 import json
+import subprocess
+import tempfile
 import unittest
 from pathlib import Path
 from unittest import mock
@@ -40,6 +42,22 @@ class HarnessStopTests(unittest.TestCase):
                 "docs/clients/AGENTS.md",
             ),
         }
+
+    def make_git_root(self) -> Path:
+        temporary = tempfile.TemporaryDirectory(prefix="unity-harness-hook-")
+        self.addCleanup(temporary.cleanup)
+        root = Path(temporary.name)
+        subprocess.run(["git", "init", "-q"], cwd=root, check=True)
+        subprocess.run(["git", "config", "user.name", "Harness Test"], cwd=root, check=True)
+        subprocess.run(
+            ["git", "config", "user.email", "harness@example.invalid"], cwd=root, check=True
+        )
+        topology = root / "AIOutput/Registry/host_topology.yaml"
+        topology.parent.mkdir(parents=True)
+        topology.write_text("schema_version: 3\n", encoding="utf-8")
+        subprocess.run(["git", "add", topology.relative_to(root)], cwd=root, check=True)
+        subprocess.run(["git", "commit", "-q", "-m", "base"], cwd=root, check=True)
+        return root
 
     def test_untracked_deletion_and_both_rename_paths_are_parsed(self) -> None:
         output = (
@@ -170,6 +188,26 @@ class HarnessStopTests(unittest.TestCase):
         payload = json.loads(stdout.getvalue())
         self.assertIn("systemMessage", payload)
         self.assertIn("broken input", payload["systemMessage"])
+
+    def test_deleted_or_malformed_topology_still_runs_and_blocks(self) -> None:
+        for mutation in ("delete", "malform"):
+            with self.subTest(mutation=mutation):
+                root = self.make_git_root()
+                topology = root / "AIOutput/Registry/host_topology.yaml"
+                if mutation == "delete":
+                    topology.unlink()
+                else:
+                    topology.write_text("broken: [\n", encoding="utf-8")
+                self.assertIn(
+                    ".:AIOutput/Registry/host_topology.yaml",
+                    harness_stop.changed_harness_paths(root),
+                )
+                with mock.patch.object(
+                    harness_stop, "run_validation", return_value=(False, "invalid topology")
+                ) as validate:
+                    result = harness_stop.decision({}, root)
+                self.assertEqual("block", result["decision"])
+                validate.assert_called_once_with(root)
 
 
 if __name__ == "__main__":

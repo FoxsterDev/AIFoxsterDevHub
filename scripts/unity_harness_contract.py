@@ -614,43 +614,62 @@ def duplicate_semantic_sections(root: Path, relatives: tuple[str, ...]) -> list[
 def route_contract_failures(root: Path, topology: dict[str, Any]) -> list[str]:
     failures: list[str] = []
     boundaries = boundary_map(topology)
-    requirements = {
-        "AIRoot": ("KERNEL.md", "post_implementation_impact_review.md", "standalone", "fallback"),
-        "ConnectivityCheckerPro": ("KERNEL.md", "post_implementation_impact_review.md", "standalone", "fallback"),
-        "DevAccelerationSystem": ("KERNEL.md", "post_implementation_impact_review.md", "standalone", "fallback"),
+    source_requirements = {
+        "AIRoot": ("router",),
+        "ConnectivityCheckerPro": ("router", "adapter"),
+        "DevAccelerationSystem": ("router", "adapter"),
     }
-    route_files: list[tuple[str, str]] = [("root", "AGENTS.md")]
-    for identity, markers in requirements.items():
+    markers = ("KERNEL.md", "post_implementation_impact_review.md", "standalone", "fallback")
+    for identity, fields in source_requirements.items():
         record = boundaries.get(identity, {})
-        paths = [record.get("router", ""), record.get("adapter", "")]
-        route_files.extend(
-            (identity, path) for path in paths if path and path != "none"
-        )
-        text = "\n".join(
-            (root / path).read_text(encoding="utf-8")
-            for path in paths if path and path != "none" and (root / path).is_file()
-        ).lower()
-        for marker in markers:
-            if marker.lower() not in text:
-                failures.append(f"{identity}: routing contract missing marker {marker!r}")
-    root_router = (root / "AGENTS.md").read_text(encoding="utf-8") if (root / "AGENTS.md").is_file() else ""
-    if "post_implementation_impact_review.md" not in root_router:
-        failures.append("root router does not route the compact runtime final pass")
-    for identity, relative in sorted(set(route_files)):
-        source = root / relative
-        if not source.is_file():
-            continue
-        for advertised in re.findall(r"`([^`\n]+)`", source.read_text(encoding="utf-8")):
-            for suffix, expected_relative in ROUTE_TARGETS.items():
-                if not advertised.endswith(suffix):
-                    continue
-                actual = Path(os.path.normpath(str(source.parent / advertised)))
-                expected = Path(os.path.normpath(str(root / expected_relative)))
-                if actual != expected or not expected.is_file():
+        for field in fields:
+            relative = record.get(field, "")
+            source = root / relative if relative and relative != "none" else None
+            if source is None or not source.is_file():
+                failures.append(f"{identity}: routing contract is missing its {field} source")
+                continue
+            text = source.read_text(encoding="utf-8")
+            lowered = text.lower()
+            for marker in markers:
+                if marker.lower() not in lowered:
                     failures.append(
-                        f"{identity}: advertised route {advertised!r} from {relative} "
-                        f"does not resolve to {expected_relative}"
+                        f"{identity} {field}: routing contract missing marker {marker!r}"
                     )
+            advertised_paths = re.findall(r"`([^`\n]+)`", text)
+            for suffix, expected_relative in ROUTE_TARGETS.items():
+                matches = [path for path in advertised_paths if path.endswith(suffix)]
+                if not matches:
+                    failures.append(
+                        f"{identity} {field}: missing advertised target {expected_relative}"
+                    )
+                    continue
+                expected = Path(os.path.normpath(str(root / expected_relative)))
+                for advertised in matches:
+                    actual = Path(os.path.normpath(str(source.parent / advertised)))
+                    if actual != expected or not expected.is_file():
+                        failures.append(
+                            f"{identity} {field}: advertised route {advertised!r} from {relative} "
+                            f"does not resolve to {expected_relative}"
+                        )
+
+    root_router_path = root / "AGENTS.md"
+    root_router = root_router_path.read_text(encoding="utf-8") if root_router_path.is_file() else ""
+    root_targets = [
+        value
+        for value in re.findall(r"`([^`\n]+)`", root_router)
+        if value.endswith("post_implementation_impact_review.md")
+    ]
+    if not root_targets:
+        failures.append("root router does not route the compact runtime final pass")
+    else:
+        expected = Path(os.path.normpath(str(root / ROUTE_TARGETS["post_implementation_impact_review.md"])))
+        for advertised in root_targets:
+            actual = Path(os.path.normpath(str(root_router_path.parent / advertised)))
+            if actual != expected or not expected.is_file():
+                failures.append(
+                    f"root router advertised route {advertised!r} does not resolve to "
+                    f"{ROUTE_TARGETS['post_implementation_impact_review.md']}"
+                )
     return failures
 
 
