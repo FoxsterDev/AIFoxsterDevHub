@@ -63,6 +63,10 @@ class HarnessStopTests(unittest.TestCase):
             "AIOutput/Harness/KERNEL.md",
             "AIOutput/Registry/host_topology.yaml",
             "scripts/unity_harness_review.py",
+            "scripts/test_unity_harness_contract.py",
+            "scripts/test_unity_harness_privacy.py",
+            "scripts/test_unity_harness_review.py",
+            "scripts/test_validate_unity_harness.py",
             "evals/unity-harness/cases.json",
             "AIFoxsterDevHub.sln",
         ):

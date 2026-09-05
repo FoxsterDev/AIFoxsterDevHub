@@ -42,6 +42,7 @@ FIXED_REQUIRED_FILES = (
     "scripts/unity_harness_contract.py",
     "scripts/unity_harness_review.py",
     "scripts/test_unity_harness_contract.py",
+    "scripts/test_unity_harness_privacy.py",
     "scripts/test_unity_harness_review.py",
     "scripts/test_validate_unity_harness.py",
 )

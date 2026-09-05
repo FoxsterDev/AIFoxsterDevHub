@@ -34,6 +34,10 @@ class RootGateContractTests(unittest.TestCase):
         self.assertIn('"current-contract-mutations"', validator)
         self.assertIn("--stop", validator)
 
+    def test_privacy_regression_owner_is_explicitly_required(self) -> None:
+        validator = Path(__file__).with_name("validate-unity-harness.py").read_text(encoding="utf-8")
+        self.assertIn('"scripts/test_unity_harness_privacy.py"', validator)
+
     def test_missing_kernel_pointer_or_fallback_fails_route_contract(self) -> None:
         temporary = tempfile.TemporaryDirectory(prefix="unity-harness-routes-")
         self.addCleanup(temporary.cleanup)
