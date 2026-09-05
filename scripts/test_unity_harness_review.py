@@ -9,7 +9,7 @@ import tempfile
 import unittest
 from pathlib import Path
 
-from unity_harness_review import ReviewScope, scope_fingerprint, validate_outcome
+from unity_harness_review import ReviewScope, parse_scopes, scope_fingerprint, validate_outcome
 
 
 def git(repo: Path, *args: str) -> str:
@@ -32,7 +32,11 @@ class HarnessReviewTests(unittest.TestCase):
         (repo / "tracked.txt").write_text("base\n", encoding="utf-8")
         git(repo, "add", "tracked.txt")
         git(repo, "commit", "-q", "-m", "base")
-        return repo, git(repo, "rev-parse", "HEAD")
+        base = git(repo, "rev-parse", "HEAD")
+        (repo / "tracked.txt").write_text("reviewed change\n", encoding="utf-8")
+        git(repo, "add", "tracked.txt")
+        git(repo, "commit", "-q", "-m", "reviewed change")
+        return repo, base
 
     def scope(self, identity: str, repo: Path, base: str, paths: list[str]) -> ReviewScope:
         resolved, digest = scope_fingerprint(repo, base, paths)
@@ -121,7 +125,6 @@ class HarnessReviewTests(unittest.TestCase):
         link.symlink_to("tracked.txt")
         git(repo, "add", "run.sh", "link")
         git(repo, "commit", "-q", "-m", "add modes")
-        base = git(repo, "rev-parse", "HEAD")
         (repo / "tracked.txt").unlink()
         scope = self.scope("root", repo, base, ["link", "run.sh", "tracked.txt"])
         record = self.record([scope])
@@ -150,11 +153,30 @@ class HarnessReviewTests(unittest.TestCase):
         )
         self.assertTrue(any("repository path" in error for error in errors))
 
+    def test_recorded_repository_identity_must_be_absolute(self) -> None:
+        repo, base = self.make_repo()
+        scope = self.scope("root", repo, base, ["tracked.txt"])
+        relative = self.record([scope]).replace(
+            f"Review repository: id=root; path={repo}",
+            "Review repository: id=root; path=.",
+        )
+        _, errors = parse_scopes(relative)
+        self.assertTrue(any("must be absolute" in error for error in errors))
+
     def test_multi_repo_scope_cannot_omit_child_or_parent_gitlink(self) -> None:
         parent, parent_base = self.make_repo("parent")
         child, child_base = self.make_repo("child")
-        (parent / "child-link").write_text("child\n", encoding="utf-8")
-        parent_scope = self.scope("root", parent, parent_base, ["child-link"])
+        child_head = git(child, "rev-parse", "HEAD")
+        (parent / "child-link").symlink_to(child, target_is_directory=True)
+        git(
+            parent,
+            "update-index",
+            "--add",
+            "--cacheinfo",
+            f"160000,{child_head},child-link",
+        )
+        git(parent, "commit", "-q", "-m", "add child gitlink")
+        parent_scope = self.scope("root", parent, parent_base, ["child-link", "tracked.txt"])
         child_scope = self.scope("child", child, child_base, ["tracked.txt"])
         expected = {"root": parent, "child": child}
         relation = [("root", "child-link", "child")]
@@ -179,7 +201,8 @@ class HarnessReviewTests(unittest.TestCase):
 
     def test_parent_gitlink_index_mutation_invalidates_fingerprint(self) -> None:
         parent, parent_base = self.make_repo("gitlink-parent")
-        child, child_head = self.make_repo("gitlink-child")
+        child, _ = self.make_repo("gitlink-child")
+        child_head = git(child, "rev-parse", "HEAD")
         (parent / "child-link").symlink_to(child, target_is_directory=True)
         git(
             parent,
@@ -188,7 +211,8 @@ class HarnessReviewTests(unittest.TestCase):
             "--cacheinfo",
             f"160000,{child_head},child-link",
         )
-        scope = self.scope("root", parent, parent_base, ["child-link"])
+        git(parent, "commit", "-q", "-m", "add child gitlink")
+        scope = self.scope("root", parent, parent_base, ["child-link", "tracked.txt"])
         record = self.record([scope])
         self.assertEqual(validate_outcome(record, lane="high-risk"), [])
 
@@ -200,6 +224,15 @@ class HarnessReviewTests(unittest.TestCase):
         )
         errors = validate_outcome(record, lane="high-risk")
         self.assertTrue(any("fingerprint" in error for error in errors))
+
+    def test_committed_scope_cannot_omit_an_ordinary_changed_file(self) -> None:
+        repo, base = self.make_repo("omitted-file")
+        (repo / "second.txt").write_text("second\n", encoding="utf-8")
+        git(repo, "add", "second.txt")
+        git(repo, "commit", "-q", "-m", "second change")
+        incomplete = self.scope("root", repo, base, ["tracked.txt"])
+        errors = validate_outcome(self.record([incomplete]), lane="high-risk")
+        self.assertTrue(any("scoped paths do not equal committed diff" in error for error in errors))
 
     def test_outcome_block_must_start_at_line_one(self) -> None:
         repo, base = self.make_repo()

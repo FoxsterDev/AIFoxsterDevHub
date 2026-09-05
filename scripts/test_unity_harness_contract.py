@@ -14,6 +14,7 @@ from unity_harness_contract import (
     DuplicateKeyError,
     assess_budget,
     duplicate_semantic_sections,
+    legacy_active_path_failures,
     load_topology,
     load_json,
     select_release_tag,
@@ -31,7 +32,14 @@ ROOT = Path(__file__).resolve().parents[1]
 
 
 class HarnessContractTests(unittest.TestCase):
-    def make_consumer(self, manifest_pin: str = EXPECTED_URL, lock_hash: str = EXPECTED_HASH) -> Path:
+    def make_consumer(
+        self,
+        manifest_pin: str = EXPECTED_URL,
+        lock_hash: str = EXPECTED_HASH,
+        *,
+        lock_source: str = "git",
+        lock_depth: int | bool = 0,
+    ) -> Path:
         temporary = tempfile.TemporaryDirectory(prefix="unity-harness-contract-")
         self.addCleanup(temporary.cleanup)
         project = Path(temporary.name)
@@ -42,8 +50,8 @@ class HarnessContractTests(unittest.TestCase):
             "dependencies": {
                 "com.xuunity.light-mcp": {
                     "version": manifest_pin,
-                    "depth": 0,
-                    "source": "git",
+                    "depth": lock_depth,
+                    "source": lock_source,
                     "hash": lock_hash,
                 }
             }
@@ -64,6 +72,16 @@ class HarnessContractTests(unittest.TestCase):
     def test_stale_lock_hash_fails(self) -> None:
         errors = validate_consumer_pin(self.make_consumer(lock_hash="b" * 40), EXPECTED_URL, EXPECTED_HASH)
         self.assertTrue(any("lock hash" in error for error in errors))
+
+    def test_lock_source_and_depth_require_exact_json_types(self) -> None:
+        for source, depth in (("registry", 0), ("git", False), ("git", 1)):
+            with self.subTest(source=source, depth=depth):
+                errors = validate_consumer_pin(
+                    self.make_consumer(lock_source=source, lock_depth=depth),
+                    EXPECTED_URL,
+                    EXPECTED_HASH,
+                )
+                self.assertTrue(any("source/depth" in error for error in errors))
 
     def test_non_exact_release_tag_fails(self) -> None:
         with self.assertRaisesRegex(ValueError, "not exact stable tag"):
@@ -126,6 +144,30 @@ class HarnessContractTests(unittest.TestCase):
             _, errors = validate_topology(ROOT)
         self.assertTrue(any("denominator" in error for error in errors))
 
+    def test_duplicate_topology_section_key_is_rejected(self) -> None:
+        temporary = tempfile.TemporaryDirectory(prefix="unity-harness-duplicate-section-")
+        self.addCleanup(temporary.cleanup)
+        root = Path(temporary.name)
+        topology_path = root / "AIOutput/Registry/host_topology.yaml"
+        topology_path.parent.mkdir(parents=True)
+        topology_path.write_text(
+            (ROOT / "AIOutput/Registry/host_topology.yaml").read_text(encoding="utf-8")
+            + "\nproject_contracts:\n"
+            + "  - id: contradictory\n",
+            encoding="utf-8",
+        )
+        with self.assertRaisesRegex(ValueError, "duplicate top-level YAML key 'project_contracts'"):
+            load_topology(root)
+
+    def test_context_sample_denominator_rejects_duplicate_pair(self) -> None:
+        topology = load_topology(ROOT)
+        duplicate = copy.deepcopy(topology)
+        extra = next(record for record in duplicate["projects"] if record["id"] == "CCP-S60")
+        extra["context_sample"] = "true"
+        with mock.patch("unity_harness_contract.load_topology", return_value=duplicate):
+            _, errors = validate_topology(ROOT)
+        self.assertTrue(any("context_sample" in error for error in errors))
+
     def test_missing_router_and_stale_long_form_path_fail(self) -> None:
         topology = load_topology(ROOT)
         missing_router = copy.deepcopy(topology)
@@ -141,6 +183,69 @@ class HarnessContractTests(unittest.TestCase):
         with mock.patch("unity_harness_contract.load_topology", return_value=stale):
             _, errors = validate_topology(ROOT)
         self.assertTrue(any("CCP_*" in error or "missing" in error for error in errors))
+
+    def test_solution_backslashes_do_not_hide_removed_long_form_paths(self) -> None:
+        temporary = tempfile.TemporaryDirectory(prefix="unity-harness-legacy-solution-")
+        self.addCleanup(temporary.cleanup)
+        root = Path(temporary.name)
+        (root / "AIFoxsterDevHub.sln").write_text(
+            "ConnectivityCheckerPro\\ConnectivityCheckerPro_Sample2022\\Project.csproj\n",
+            encoding="utf-8",
+        )
+        self.assertEqual(
+            [
+                "active file contains removed Connectivity names "
+                "['ConnectivityCheckerPro/ConnectivityCheckerPro_', 'Sample2022']: "
+                "AIFoxsterDevHub.sln"
+            ],
+            legacy_active_path_failures(root),
+        )
+
+    def test_child_adapter_rejects_bare_removed_project_names(self) -> None:
+        temporary = tempfile.TemporaryDirectory(prefix="unity-harness-legacy-adapter-")
+        self.addCleanup(temporary.cleanup)
+        root = Path(temporary.name)
+        adapter = root / "ConnectivityCheckerPro/Harness/unity-adapter.md"
+        adapter.parent.mkdir(parents=True)
+        adapter.write_text("Use Sample6000_3_2f1 and Sample2021.\n", encoding="utf-8")
+        errors = legacy_active_path_failures(root)
+        self.assertEqual(1, len(errors))
+        self.assertIn("Sample6000_3_2f1", errors[0])
+        self.assertIn("Sample2021", errors[0])
+        self.assertIn("ConnectivityCheckerPro/Harness/unity-adapter.md", errors[0])
+
+    def test_inline_competing_setup_list_is_rejected(self) -> None:
+        topology = load_topology(ROOT)
+        temporary = tempfile.TemporaryDirectory(prefix="unity-harness-inline-setup-")
+        self.addCleanup(temporary.cleanup)
+        root = Path(temporary.name)
+        setup = root / "AIOutput/Registry/setup_status.yaml"
+        setup.parent.mkdir(parents=True)
+        setup.write_text(
+            "topology_source: AIOutput/Registry/host_topology.yaml\n"
+            "routed_projects: [stale/project]\n",
+            encoding="utf-8",
+        )
+        with mock.patch("unity_harness_contract.load_topology", return_value=topology):
+            _, errors = validate_topology(root)
+        self.assertTrue(any("competing routed_projects" in error for error in errors))
+
+    def test_boundary_targets_and_project_paths_cannot_cross_boundaries(self) -> None:
+        topology = load_topology(ROOT)
+        cross_target = copy.deepcopy(topology)
+        airroot = next(record for record in cross_target["boundaries"] if record["id"] == "AIRoot")
+        airroot["router"] = "ConnectivityCheckerPro/AGENTS.md"
+        with mock.patch("unity_harness_contract.load_topology", return_value=cross_target):
+            _, errors = validate_topology(ROOT)
+        self.assertTrue(any("outside declared boundary" in error for error in errors))
+
+        cross_project = copy.deepcopy(topology)
+        das = next(record for record in cross_project["projects"] if record["id"] == "DAS-SRC")
+        das["path"] = "ConnectivityCheckerPro/CCP_PUB"
+        das["router"] = "ConnectivityCheckerPro/CCP_PUB/AGENTS.md"
+        with mock.patch("unity_harness_contract.load_topology", return_value=cross_project):
+            _, errors = validate_topology(ROOT)
+        self.assertTrue(any("outside git boundary" in error for error in errors))
 
 
 if __name__ == "__main__":

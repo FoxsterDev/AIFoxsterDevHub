@@ -75,6 +75,14 @@ ACTIVE_TOPOLOGY_TEXT_FILES = (
     "AIModules/XUUnityInternal/knowledge/validation_paths.md",
     "scripts/refresh-aifoxster-hub.sh",
     "AIFoxsterDevHub.sln",
+    "ConnectivityCheckerPro/Harness/unity-adapter.md",
+)
+
+REMOVED_CONNECTIVITY_MARKERS = (
+    "ConnectivityCheckerPro/ConnectivityCheckerPro_",
+    "Sample6000_3_2f1",
+    "Sample2021",
+    "Sample2022",
 )
 
 
@@ -167,8 +175,20 @@ def parse_yaml_blocks(path: Path, key: str) -> list[dict[str, str]]:
     return blocks
 
 
+def require_unique_top_level_yaml_keys(path: Path) -> None:
+    seen: set[str] = set()
+    for line_number, line in enumerate(path.read_text(encoding="utf-8").splitlines(), start=1):
+        if not line or line[0].isspace() or line.startswith("#") or ":" not in line:
+            continue
+        key = line.split(":", 1)[0].strip()
+        if key in seen:
+            raise ValueError(f"duplicate top-level YAML key {key!r} at line {line_number}")
+        seen.add(key)
+
+
 def load_topology(root: Path) -> dict[str, Any]:
     path = root / TOPOLOGY_PATH
+    require_unique_top_level_yaml_keys(path)
     return {
         "path": path,
         "scalars": parse_yaml_scalars(path),
@@ -192,6 +212,14 @@ def _relative(value: str, *, allow_dot: bool = False) -> bool:
     return bool(value) and not path.is_absolute() and ".." not in path.parts and (
         allow_dot or value != "."
     ) and path.as_posix() == value
+
+
+def _within_boundary(value: str, boundary: str) -> bool:
+    if boundary == ".":
+        return _relative(value)
+    value_parts = PurePosixPath(value).parts
+    boundary_parts = PurePosixPath(boundary).parts
+    return value_parts[:len(boundary_parts)] == boundary_parts
 
 
 def boundary_map(topology: dict[str, Any]) -> dict[str, dict[str, str]]:
@@ -232,6 +260,7 @@ def validate_topology(root: Path) -> tuple[dict[str, Any], list[str]]:
         failures.append(f"topology_owner must be {TOPOLOGY_PATH}")
 
     projects = topology["projects"]
+    boundary_records = boundary_map(topology)
     ids = [record.get("id", "") for record in projects]
     paths = [record.get("path", "") for record in projects]
     if len(projects) != EXPECTED_CONSUMER_COUNT:
@@ -262,6 +291,13 @@ def validate_topology(root: Path) -> tuple[dict[str, Any], list[str]]:
         if not _relative(record["path"]):
             failures.append(f"{identity}: invalid project path {record['path']!r}")
             continue
+        boundary_record = boundary_records.get(record["git_boundary"])
+        if boundary_record is None or not _within_boundary(
+            record["path"], boundary_record.get("path", "")
+        ):
+            failures.append(
+                f"{identity}: project path is outside git boundary {record['git_boundary']}"
+            )
         if record["git_boundary"] == "ConnectivityCheckerPro" and not Path(record["path"]).name.startswith("CCP_"):
             failures.append(f"{identity}: Connectivity project must use current CCP_* topology")
         expected_router = f"{record['path']}/AGENTS.md"
@@ -300,7 +336,10 @@ def validate_topology(root: Path) -> tuple[dict[str, Any], list[str]]:
     except ValueError:
         context_samples = []
     sample_pairs = {(record.get("git_boundary"), record.get("role")) for record in context_samples}
-    if sample_pairs != {("ConnectivityCheckerPro", "consumer"), ("DevAccelerationSystem", "demo")}:
+    if len(context_samples) != 2 or sample_pairs != {
+        ("ConnectivityCheckerPro", "consumer"),
+        ("DevAccelerationSystem", "demo"),
+    }:
         failures.append("context_sample must select one Connectivity consumer and the DAS demo")
 
     if topology["routed_projects"] != paths:
@@ -327,6 +366,10 @@ def validate_topology(root: Path) -> tuple[dict[str, Any], list[str]]:
             target = record[field]
             if target != "none" and (not _relative(target) or not (root / target).exists()):
                 failures.append(f"{identity}: advertised {field} target is missing or invalid: {target}")
+            elif target != "none" and not _within_boundary(target, record["path"]):
+                failures.append(
+                    f"{identity}: advertised {field} target is outside declared boundary: {target}"
+                )
 
     expected_relations = {
         "root": (".", "none", "none"),
@@ -344,7 +387,7 @@ def validate_topology(root: Path) -> tuple[dict[str, Any], list[str]]:
     try:
         setup_text = setup.read_text(encoding="utf-8")
         setup_scalars = parse_yaml_scalars(setup)
-        if re.search(r"^routed_projects:\s*$", setup_text, re.MULTILINE):
+        if re.search(r"^routed_projects\s*:", setup_text, re.MULTILINE):
             failures.append("setup_status.yaml must not own a competing routed_projects list")
         if setup_scalars.get("topology_source") != TOPOLOGY_PATH:
             failures.append("setup_status.yaml must point to the topology owner")
@@ -401,7 +444,8 @@ def validate_consumer_pin(project: Path, expected_url: str, expected_hash: str) 
         errors.append(f"lock version is {lock_entry.get('version')!r}, expected {expected_url!r}")
     if lock_entry.get("hash") != expected_hash:
         errors.append(f"lock hash is {lock_entry.get('hash')!r}, expected {expected_hash!r}")
-    if lock_entry.get("source") != "git" or lock_entry.get("depth") != 0:
+    depth = lock_entry.get("depth")
+    if lock_entry.get("source") != "git" or type(depth) is not int or depth != 0:
         errors.append("lock source/depth is not exact git depth 0")
     return errors
 
@@ -674,10 +718,13 @@ def route_contract_failures(root: Path, topology: dict[str, Any]) -> list[str]:
 
 
 def legacy_active_path_failures(root: Path) -> list[str]:
-    marker = "ConnectivityCheckerPro/" + "ConnectivityCheckerPro_"
     failures: list[str] = []
     for relative in ACTIVE_TOPOLOGY_TEXT_FILES:
         path = root / relative
-        if path.is_file() and marker in path.read_text(encoding="utf-8", errors="replace"):
-            failures.append(f"active file contains removed long-form Connectivity path: {relative}")
+        text = path.read_text(encoding="utf-8", errors="replace").replace("\\", "/") if path.is_file() else ""
+        markers = [marker for marker in REMOVED_CONNECTIVITY_MARKERS if marker in text]
+        if markers:
+            failures.append(
+                f"active file contains removed Connectivity names {markers}: {relative}"
+            )
     return failures

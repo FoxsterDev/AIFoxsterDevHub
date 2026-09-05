@@ -26,6 +26,10 @@ BASE_RE = re.compile(r"[0-9a-f]{40}(?:[0-9a-f]{24})?")
 FINGERPRINT_RE = re.compile(r"sha256:[0-9a-f]{64}")
 REPOSITORY_RE = re.compile(r"Review repository: id=([A-Za-z0-9._-]+); path=(.+)")
 REVIEWER_RE = re.compile(r"Reviewer context: (.+); reviewer authored the reviewed diff: (yes|no)\.")
+ROOT_STATUS_ONLY_PATHS = {
+    "AIOutput/Harness/current-handoff.md",
+    "AIOutput/Harness/validation-evidence-2026-09-02.md",
+}
 
 
 @dataclass(frozen=True)
@@ -91,6 +95,11 @@ def parse_scopes(text: str) -> tuple[list[ReviewScope], list[str]]:
         if not match:
             errors.append(f"invalid Review repository line: {line!r}")
             continue
+        repository = Path(match.group(2))
+        if not repository.is_absolute():
+            errors.append(
+                f"{match.group(1)}: Review repository path must be absolute: {match.group(2)!r}"
+            )
         if index + 3 >= len(lines):
             errors.append(f"review tuple for {match.group(1)} is incomplete")
             continue
@@ -110,7 +119,7 @@ def parse_scopes(text: str) -> tuple[list[ReviewScope], list[str]]:
         if values[2] and FINGERPRINT_RE.fullmatch(values[2]) is None:
             errors.append(f"{match.group(1)}: Review fingerprint must be sha256:<64 lowercase hex>")
         scopes.append(
-            ReviewScope(match.group(1), Path(match.group(2)), values[0], paths, values[2])
+            ReviewScope(match.group(1), repository, values[0], paths, values[2])
         )
     identities = [scope.identity for scope in scopes]
     repositories = [str(scope.repository.resolve()) for scope in scopes]
@@ -153,6 +162,25 @@ def _index_entry(repo: Path, relative: str) -> tuple[str, str] | None:
     if not match:
         raise ValueError(f"cannot parse index entry for {relative!r}: {lines[0]!r}")
     return match.group(1), match.group(2)
+
+
+def _committed_diff_paths(repo: Path, base: str) -> tuple[str, ...]:
+    output = _git(repo, "diff", "--name-only", "--no-renames", f"{base}...HEAD", "--")
+    paths = tuple(sorted({line for line in output.splitlines() if line}))
+    _, errors = normalized_paths(",".join(paths)) if paths else ((), [])
+    if errors:
+        raise ValueError("cannot normalize committed diff: " + "; ".join(errors))
+    return paths
+
+
+def _tree_gitlink(repo: Path, relative: str) -> str | None:
+    output = _git(repo, "ls-tree", "HEAD", "--", relative)
+    if not output:
+        return None
+    match = re.fullmatch(r"160000 commit ([0-9a-f]{40,64})\t.+", output)
+    if match is None:
+        return None
+    return match.group(1)
 
 
 def scope_fingerprint(repo: Path, base: str, paths: list[str] | tuple[str, ...]) -> tuple[str, str]:
@@ -286,12 +314,47 @@ def validate_outcome(
         if scope and scope.repository.resolve() != expected.resolve():
             errors.append(f"{identity}: repository path does not match expected identity")
 
+    for scope in scopes:
+        try:
+            committed_paths = _committed_diff_paths(scope.repository, scope.base)
+        except (OSError, ValueError) as error:
+            errors.append(f"{scope.identity}: cannot resolve committed review diff: {error}")
+            continue
+        if scope.identity == "root":
+            committed_paths = tuple(
+                path for path in committed_paths if path not in ROOT_STATUS_ONLY_PATHS
+            )
+        if scope.paths != committed_paths:
+            errors.append(
+                f"{scope.identity}: scoped paths do not equal committed diff; "
+                f"missing={sorted(set(committed_paths) - set(scope.paths))} "
+                f"extra={sorted(set(scope.paths) - set(committed_paths))}"
+            )
+
     for parent, gitlink, child in required_relations or []:
         if parent not in by_id or child not in by_id:
             errors.append(f"multi-repository scope omits relation {parent}:{gitlink}:{child}")
             continue
         if gitlink not in by_id[parent].paths:
             errors.append(f"parent scope {parent} omits child gitlink {gitlink}")
+            continue
+        parent_scope = by_id[parent]
+        child_scope = by_id[child]
+        try:
+            index_entry = _index_entry(parent_scope.repository, gitlink)
+            tree_oid = _tree_gitlink(parent_scope.repository, gitlink)
+            child_head = _git(child_scope.repository, "rev-parse", "HEAD")
+        except (OSError, ValueError) as error:
+            errors.append(f"relation {parent}:{gitlink}:{child} could not be resolved: {error}")
+            continue
+        if index_entry is None or index_entry[0] != "160000" or tree_oid is None:
+            errors.append(f"relation {parent}:{gitlink}:{child} is not a committed mode-160000 gitlink")
+            continue
+        if index_entry[1] != tree_oid or tree_oid != child_head:
+            errors.append(
+                f"relation {parent}:{gitlink}:{child} OID mismatch: "
+                f"index={index_entry[1]} tree={tree_oid} child={child_head}"
+            )
 
     if not errors:
         for scope in scopes:

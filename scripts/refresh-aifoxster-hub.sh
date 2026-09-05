@@ -1,7 +1,9 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
+DEFAULT_ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
+ROOT_DIR="${AIFOXSTER_HUB_ROOT:-$DEFAULT_ROOT_DIR}"
+ROOT_DIR="$(cd "$ROOT_DIR" && pwd)"
 SOLUTION_PATH="$ROOT_DIR/AIFoxsterDevHub.sln"
 
 SOLUTION_FOLDER_TYPE="{2150E333-8FDC-42A3-9474-1A3956D46DE8}"
@@ -31,7 +33,6 @@ PROJECT_SPECS=(
 )
 
 WORKSPACE_ITEMS=(
-  "LFS_MIGRATION_PLAN.md"
   "WORKSPACE.md"
   "scripts/refresh-aifoxster-hub.sh"
 )
@@ -60,9 +61,16 @@ DAS_WORKSPACE_ITEMS=(
   "DevAccelerationSystem/DevAccelerationSystem/Assets/TheBestLogger/package.json"
   "DevAccelerationSystem/DevAccelerationSystem.DemoProject/DevAccelerationSystem.DemoProject.sln"
   "DevAccelerationSystem/DevAccelerationSystem.DemoProject/Packages/manifest.json"
+)
+
+DAS_OPTIONAL_WORKSPACE_ITEMS=(
   "DevAccelerationSystem/DAS.LocalProject/DAS.LocalProject.sln"
   "DevAccelerationSystem/DAS.LocalProject/Packages/manifest.json"
 )
+
+if [[ -d "$ROOT_DIR/DevAccelerationSystem/DAS.LocalProject" ]]; then
+  DAS_WORKSPACE_ITEMS+=("${DAS_OPTIONAL_WORKSPACE_ITEMS[@]}")
+fi
 
 to_windows_path() {
   printf '%s\n' "${1//\//\\}"

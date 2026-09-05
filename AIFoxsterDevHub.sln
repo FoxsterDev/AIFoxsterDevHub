@@ -2,7 +2,6 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Workspace", "Workspace", "{3C98D1EF-41B4-4A9E-9B73-A3C9775B6D0B}"
 	ProjectSection(SolutionItems) = preProject
-		LFS_MIGRATION_PLAN.md = LFS_MIGRATION_PLAN.md
 		WORKSPACE.md = WORKSPACE.md
 		scripts\refresh-aifoxster-hub.sh = scripts\refresh-aifoxster-hub.sh
 	EndProjectSection
@@ -46,8 +45,6 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Workspaces", "Workspaces", 
 		DevAccelerationSystem\DevAccelerationSystem\Assets\TheBestLogger\package.json = DevAccelerationSystem\DevAccelerationSystem\Assets\TheBestLogger\package.json
 		DevAccelerationSystem\DevAccelerationSystem.DemoProject\DevAccelerationSystem.DemoProject.sln = DevAccelerationSystem\DevAccelerationSystem.DemoProject\DevAccelerationSystem.DemoProject.sln
 		DevAccelerationSystem\DevAccelerationSystem.DemoProject\Packages\manifest.json = DevAccelerationSystem\DevAccelerationSystem.DemoProject\Packages\manifest.json
-		DevAccelerationSystem\DAS.LocalProject\DAS.LocalProject.sln = DevAccelerationSystem\DAS.LocalProject\DAS.LocalProject.sln
-		DevAccelerationSystem\DAS.LocalProject\Packages\manifest.json = DevAccelerationSystem\DAS.LocalProject\Packages\manifest.json
 	EndProjectSection
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ConnectivityCheckerPro.Runtime", "ConnectivityCheckerPro\CCP_PUB\ConnectivityCheckerPro.Runtime.csproj", "{C36AB83C-AC7E-33C3-EB13-4E6EFEFD194D}"

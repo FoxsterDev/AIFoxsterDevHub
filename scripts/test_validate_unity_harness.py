@@ -3,6 +3,8 @@
 
 from __future__ import annotations
 
+import os
+import subprocess
 import tempfile
 import unittest
 from pathlib import Path
@@ -134,6 +136,80 @@ class RootGateContractTests(unittest.TestCase):
         )
         errors = unity_harness_contract.route_contract_failures(root, topology)
         self.assertFalse(any("advertised route" in error for error in errors))
+
+    def test_root_solution_refresh_accepts_absent_optional_but_not_missing_required(self) -> None:
+        temporary = tempfile.TemporaryDirectory(prefix="unity-harness-solution-refresh-")
+        self.addCleanup(temporary.cleanup)
+        root = Path(temporary.name)
+        required_items = (
+            "WORKSPACE.md",
+            "scripts/refresh-aifoxster-hub.sh",
+            "AIRoot/README.md",
+            "AIRoot/INTEGRATION.md",
+            "AIRoot/Modules/XUUnity/README.md",
+            "AIRoot/Design/XUUNITY_PRODUCT_PROTOCOLS_DESIGN.md",
+            "ConnectivityCheckerPro/CCP_PUB/CCP_PUB.sln",
+            "ConnectivityCheckerPro/CCP_PUB/Assets/ConnectivityCheckerPro/package.json",
+            "ConnectivityCheckerPro/CCP_S21/Packages/manifest.json",
+            "ConnectivityCheckerPro/CCP_S22/Packages/manifest.json",
+            "ConnectivityCheckerPro/CCP_S60/CCP_S60.sln",
+            "ConnectivityCheckerPro/CCP_S60/Packages/manifest.json",
+            "ConnectivityCheckerPro/CCP_S63/CCP_S63.sln",
+            "ConnectivityCheckerPro/CCP_S63/Packages/manifest.json",
+            "DevAccelerationSystem/DevAccelerationSystem/DevAccelerationSystem.sln",
+            "DevAccelerationSystem/DevAccelerationSystem/Assets/DevAccelerationSystem/package.json",
+            "DevAccelerationSystem/DevAccelerationSystem/Assets/TheBestLogger/package.json",
+            "DevAccelerationSystem/DevAccelerationSystem.DemoProject/DevAccelerationSystem.DemoProject.sln",
+            "DevAccelerationSystem/DevAccelerationSystem.DemoProject/Packages/manifest.json",
+        )
+        project_paths = (
+            "ConnectivityCheckerPro/CCP_PUB/ConnectivityCheckerPro.Runtime.csproj",
+            "ConnectivityCheckerPro/CCP_PUB/ConnectivityCheckerPro.Samples.csproj",
+            "ConnectivityCheckerPro/CCP_PUB/ConnectivityCheckerPro.Tests.csproj",
+            "ConnectivityCheckerPro/CCP_PUB/ConnectivityCheckerPro.PlayMode.Tests.csproj",
+            "DevAccelerationSystem/DevAccelerationSystem/DevAccelerationSystem.Core.csproj",
+            "DevAccelerationSystem/DevAccelerationSystem/DevAccelerationSystem.ProjectCompilationCheck.csproj",
+            "DevAccelerationSystem/DevAccelerationSystem/DevAccelerationSystem.Editor.Tests.csproj",
+            "DevAccelerationSystem/DevAccelerationSystem.DemoProject/TheBestLoggerSample.csproj",
+            "DevAccelerationSystem/DevAccelerationSystem.DemoProject/TheBestLogger.Integration.Tests.csproj",
+        )
+        for relative in required_items:
+            path = root / relative
+            path.parent.mkdir(parents=True, exist_ok=True)
+            path.write_text("fixture\n", encoding="utf-8")
+        for index, relative in enumerate(project_paths, start=1):
+            path = root / relative
+            path.parent.mkdir(parents=True, exist_ok=True)
+            guid = f"00000000-0000-0000-0000-{index:012d}"
+            path.write_text(f"<ProjectGuid>{{{guid}}}</ProjectGuid>\n", encoding="utf-8")
+
+        script = Path(__file__).with_name("refresh-aifoxster-hub.sh")
+        environment = {**os.environ, "AIFOXSTER_HUB_ROOT": str(root)}
+        absent = subprocess.run(
+            [str(script)], check=False, capture_output=True, text=True, env=environment
+        )
+        self.assertEqual(0, absent.returncode, absent.stderr)
+        self.assertNotIn("DAS.LocalProject", (root / "AIFoxsterDevHub.sln").read_text())
+
+        for relative in (
+            "DevAccelerationSystem/DAS.LocalProject/DAS.LocalProject.sln",
+            "DevAccelerationSystem/DAS.LocalProject/Packages/manifest.json",
+        ):
+            path = root / relative
+            path.parent.mkdir(parents=True, exist_ok=True)
+            path.write_text("optional\n", encoding="utf-8")
+        present = subprocess.run(
+            [str(script)], check=False, capture_output=True, text=True, env=environment
+        )
+        self.assertEqual(0, present.returncode, present.stderr)
+        self.assertIn("DAS.LocalProject", (root / "AIFoxsterDevHub.sln").read_text())
+
+        (root / "WORKSPACE.md").unlink()
+        missing = subprocess.run(
+            [str(script)], check=False, capture_output=True, text=True, env=environment
+        )
+        self.assertNotEqual(0, missing.returncode)
+        self.assertIn("Missing solution item: WORKSPACE.md", missing.stderr)
 
 
 if __name__ == "__main__":
