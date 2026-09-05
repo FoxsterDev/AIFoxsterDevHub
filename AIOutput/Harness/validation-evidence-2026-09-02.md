@@ -31,9 +31,9 @@ five v4 fingerprints after this outcome commit exists.
 
 ## Git Boundaries And Pins
 
-| Boundary | Isolated base | Task/follow-up head represented by this outcome | Parent-pin decision |
+| Boundary | Isolated base | Harness implementation / child follow-up head | Parent-pin decision |
 | --- | --- | --- | --- |
-| Hub root | `878f4e6d3ddfea1647330a63c5dfe1bdfd02fe14` | `d1d4b831d7d1a3e69d2449691b929ecd9ea5fcd2` | Root status-only outcome commit follows; its exact SHA is reported externally because a commit cannot contain its own SHA. |
+| Hub root | `878f4e6d3ddfea1647330a63c5dfe1bdfd02fe14` | `d1d4b831d7d1a3e69d2449691b929ecd9ea5fcd2` | Harness implementation head. Outcome commit is `68a001564572e8e8dd86b6173ec2a498e215718f`; owner-requested cleanup commit is `1a78ad9da825eb3ccf46bb1001680a1efc4111d9`; the final evidence-correction commit SHA is reported externally because a commit cannot contain its own SHA. |
 | AIRoot | `86e86d64975fedccb195e0a21ea6ff2c340b62a7` | `517493efeca711def648d18aecaf6882ed8de313` | Root pin advanced exactly from base to child head. |
 | ConnectivityCheckerPro | `8cc785f94be6558169f48b91840efe37b0466d90` | `c8559e81df493d1f740d834d2a7908dcae4a541c` | Root pin advanced exactly from base to child head. |
 | DevAccelerationSystem | `ca99e6932cbda965463753fc3c75c162b571c07b` | `ebea7cb98fdd77556c8529eacc9f9d05b895faa2` | Root pin advanced to the Harness head and then to the owner-authorized `.editorconfig` line-ending snapshot. |
@@ -49,7 +49,8 @@ Task-owned child commits:
   `bd43ad20cf259a137180fc97f520d07672d4c56f`, and the explicit follow-up
   snapshot `ebea7cb98fdd77556c8529eacc9f9d05b895faa2`.
 - Hub implementation range: `878f4e6d3ddfea1647330a63c5dfe1bdfd02fe14..d1d4b831d7d1a3e69d2449691b929ecd9ea5fcd2`
-  (ten commits, followed only by this outcome/handoff commit).
+  (ten implementation commits, followed by the outcome/handoff, owner-requested cleanup,
+  and evidence-correction commits).
 
 Imported gitlink ranges are exactly:
 
