@@ -13,8 +13,8 @@ These are the canonical sources. Changes there apply to the consumer workspaces 
 - `ConnectivityCheckerPro/CCP_S22`
 - `ConnectivityCheckerPro/CCP_S60`
 - `ConnectivityCheckerPro/CCP_S63`
-- `DevAccelerationSystem.DemoProject`
-- `DAS.LocalProject` when present as an optional local-only validation workspace
+- `DevAccelerationSystem/DevAccelerationSystem.DemoProject`
+- `DevAccelerationSystem/DAS.LocalProject` when present as an optional local-only validation workspace
 
 All tracked Connectivity consumers use local `file:` dependencies on the
 canonical package in `ConnectivityCheckerPro/CCP_PUB`; `CCP_S22` also consumes

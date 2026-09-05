@@ -234,6 +234,21 @@ class HarnessReviewTests(unittest.TestCase):
         errors = validate_outcome(self.record([incomplete]), lane="high-risk")
         self.assertTrue(any("scoped paths do not equal committed diff" in error for error in errors))
 
+    def test_root_scope_cannot_omit_committed_status_or_evidence(self) -> None:
+        repo, base = self.make_repo("status-files")
+        harness = repo / "AIOutput/Harness"
+        harness.mkdir(parents=True)
+        (harness / "current-handoff.md").write_text("handoff\n", encoding="utf-8")
+        (harness / "validation-evidence-2026-09-02.md").write_text(
+            "evidence\n", encoding="utf-8"
+        )
+        git(repo, "add", "AIOutput/Harness")
+        git(repo, "commit", "-q", "-m", "status")
+        incomplete = self.scope("root", repo, base, ["tracked.txt"])
+        errors = validate_outcome(self.record([incomplete]), lane="high-risk")
+        self.assertTrue(any("current-handoff.md" in error for error in errors))
+        self.assertTrue(any("validation-evidence-2026-09-02.md" in error for error in errors))
+
     def test_outcome_block_must_start_at_line_one(self) -> None:
         repo, base = self.make_repo()
         scope = self.scope("root", repo, base, ["tracked.txt"])

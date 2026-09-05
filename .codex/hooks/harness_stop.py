@@ -44,8 +44,10 @@ def _relative_to_boundary(global_path: str, boundary_path: str) -> str | None:
     return None
 
 
-def configured_paths(root: Path) -> tuple[dict[Path, tuple[str, ...]], tuple[str, ...]]:
-    """Derive active child-owned trigger paths and parent gitlinks from topology."""
+def configured_paths(
+    root: Path,
+) -> tuple[dict[Path, tuple[str, ...]], dict[Path, tuple[str, ...]]]:
+    """Derive active child triggers and pointer-only parent gitlinks from topology."""
     scripts = str(root / "scripts")
     if scripts not in sys.path:
         sys.path.insert(0, scripts)
@@ -54,17 +56,19 @@ def configured_paths(root: Path) -> tuple[dict[Path, tuple[str, ...]], tuple[str
     topology = load_topology(root)
     boundaries = boundary_map(topology)
     child_paths: dict[Path, set[str]] = {}
-    root_gitlinks: list[str] = []
+    gitlinks_by_parent: dict[Path, set[str]] = {}
     for identity, record in boundaries.items():
         if identity == "root":
             continue
         boundary = Path(record["path"])
         child_paths.setdefault(boundary, set())
         if record["parent"] == "root":
-            root_gitlinks.append(record["gitlink"])
+            parent_path = Path(".")
         elif record["parent"] in boundaries:
             parent_path = Path(boundaries[record["parent"]]["path"])
-            child_paths.setdefault(parent_path, set()).add(record["gitlink"])
+        else:
+            continue
+        gitlinks_by_parent.setdefault(parent_path, set()).add(record["gitlink"])
         for field in ("router", "kernel", "adapter", "generator"):
             target = record[field]
             if target == "none":
@@ -80,7 +84,7 @@ def configured_paths(root: Path) -> tuple[dict[Path, tuple[str, ...]], tuple[str
             child_paths.setdefault(boundary, set()).add(relative)
     return (
         {repo: tuple(sorted(paths)) for repo, paths in child_paths.items()},
-        tuple(sorted(root_gitlinks)),
+        {repo: tuple(sorted(paths)) for repo, paths in gitlinks_by_parent.items()},
     )
 
 
@@ -153,13 +157,20 @@ def changed_harness_paths(root: Path) -> list[str]:
     if fixed_root_changes:
         return fixed_root_changes
 
-    child_paths, root_gitlinks = configured_paths(root)
+    child_paths, gitlinks_by_parent = configured_paths(root)
     changed: list[str] = []
     for path in root_status_paths:
-        if path in root_gitlinks and _gitlink_pointer_changed(root, path):
+        if path in gitlinks_by_parent.get(Path("."), ()) and _gitlink_pointer_changed(root, path):
             changed.append(f".:{path}")
-    for repo in sorted(child_paths, key=lambda value: value.as_posix()):
+    child_repositories = set(child_paths) | {
+        repo for repo in gitlinks_by_parent if repo != Path(".")
+    }
+    for repo in sorted(child_repositories, key=lambda value: value.as_posix()):
         for path in _status_paths(root / repo):
+            if path in gitlinks_by_parent.get(repo, ()):
+                if _gitlink_pointer_changed(root / repo, path):
+                    changed.append(f"{repo}:{path}")
+                continue
             if is_harness_path(repo, path, child_paths):
                 changed.append(f"{repo}:{path}")
     return sorted(set(changed))

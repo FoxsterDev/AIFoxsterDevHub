@@ -20,6 +20,7 @@ from unity_harness_contract import (
     select_release_tag,
     validate_consumer_pin,
     validate_topology,
+    workspace_topology_mirror_failures,
 )
 
 
@@ -213,6 +214,24 @@ class HarnessContractTests(unittest.TestCase):
         self.assertIn("Sample6000_3_2f1", errors[0])
         self.assertIn("Sample2021", errors[0])
         self.assertIn("ConnectivityCheckerPro/Harness/unity-adapter.md", errors[0])
+
+    def test_workspace_mirror_requires_exact_prefixed_das_paths(self) -> None:
+        temporary = tempfile.TemporaryDirectory(prefix="unity-harness-workspace-mirror-")
+        self.addCleanup(temporary.cleanup)
+        root = Path(temporary.name)
+        text = (ROOT / "WORKSPACE.md").read_text(encoding="utf-8")
+        text = text.replace(
+            "`DevAccelerationSystem/DevAccelerationSystem.DemoProject`",
+            "`DevAccelerationSystem.DemoProject`",
+        ).replace(
+            "`DevAccelerationSystem/DAS.LocalProject`",
+            "`DAS.LocalProject`",
+        )
+        (root / "WORKSPACE.md").write_text(text, encoding="utf-8")
+        errors = workspace_topology_mirror_failures(root, load_topology(ROOT))
+        self.assertEqual(2, len(errors))
+        self.assertTrue(any("DevAccelerationSystem.DemoProject" in error for error in errors))
+        self.assertTrue(any("DAS.LocalProject" in error for error in errors))
 
     def test_inline_competing_setup_list_is_rejected(self) -> None:
         topology = load_topology(ROOT)

@@ -23,7 +23,6 @@ class HarnessStopTests(unittest.TestCase):
             Path("AIRoot"): (
                 "AGENTS.md",
                 "Modules/XUUnity/reviews/post_implementation_impact_review.md",
-                "Operations/XUUnityLightUnityMcp",
             ),
             Path("ConnectivityCheckerPro"): (
                 "AGENTS.md",
@@ -94,7 +93,7 @@ class HarnessStopTests(unittest.TestCase):
                 Path("ConnectivityCheckerPro"), "CCP_S22/AGENTS.md", self.child_paths
             )
         )
-        self.assertTrue(
+        self.assertFalse(
             harness_stop.is_harness_path(
                 Path("AIRoot"), "Operations/XUUnityLightUnityMcp", self.child_paths
             )
@@ -118,19 +117,117 @@ class HarnessStopTests(unittest.TestCase):
         )
 
     def test_current_topology_discovers_all_active_adapters(self) -> None:
-        paths, root_gitlinks = harness_stop.configured_paths(ROOT)
+        paths, gitlinks_by_parent = harness_stop.configured_paths(ROOT)
         self.assertEqual(
-            ("AIRoot", "ConnectivityCheckerPro", "DevAccelerationSystem"), root_gitlinks
+            ("AIRoot", "ConnectivityCheckerPro", "DevAccelerationSystem"),
+            gitlinks_by_parent[Path(".")],
         )
         self.assertIn("CCP_S22/AGENTS.md", paths[Path("ConnectivityCheckerPro")])
         self.assertIn(
             "Docs/ai/unity-unified-harness-adapter.md",
             paths[Path("DevAccelerationSystem")],
         )
-        self.assertIn(
+        self.assertNotIn(
             "Operations/XUUnityLightUnityMcp",
             paths[Path("AIRoot")],
         )
+        self.assertEqual(
+            ("Operations/XUUnityLightUnityMcp",),
+            gitlinks_by_parent[Path("AIRoot")],
+        )
+
+    def test_nested_mcp_dirt_is_scoped_but_gitlink_pointer_and_router_trigger(self) -> None:
+        root = self.make_git_root()
+        airroot = root / "AIRoot"
+        airroot.mkdir()
+        subprocess.run(["git", "init", "-q"], cwd=airroot, check=True)
+        subprocess.run(["git", "config", "user.name", "Harness Test"], cwd=airroot, check=True)
+        subprocess.run(
+            ["git", "config", "user.email", "harness@example.invalid"],
+            cwd=airroot,
+            check=True,
+        )
+        (airroot / "AGENTS.md").write_text("AIRoot router\n", encoding="utf-8")
+
+        nested_relative = "Operations/XUUnityLightUnityMcp"
+        mcp = airroot / nested_relative
+        mcp.mkdir(parents=True)
+        subprocess.run(["git", "init", "-q"], cwd=mcp, check=True)
+        subprocess.run(["git", "config", "user.name", "Harness Test"], cwd=mcp, check=True)
+        subprocess.run(
+            ["git", "config", "user.email", "harness@example.invalid"], cwd=mcp, check=True
+        )
+        (mcp / "AGENTS.md").write_text("MCP router\n", encoding="utf-8")
+        (mcp / "runtime.txt").write_text("base runtime\n", encoding="utf-8")
+        subprocess.run(["git", "add", "AGENTS.md", "runtime.txt"], cwd=mcp, check=True)
+        subprocess.run(["git", "commit", "-q", "-m", "MCP base"], cwd=mcp, check=True)
+        mcp_head = subprocess.check_output(["git", "rev-parse", "HEAD"], cwd=mcp, text=True).strip()
+
+        subprocess.run(["git", "add", "AGENTS.md"], cwd=airroot, check=True)
+        subprocess.run(
+            [
+                "git", "update-index", "--add", "--cacheinfo",
+                f"160000,{mcp_head},{nested_relative}",
+            ],
+            cwd=airroot,
+            check=True,
+        )
+        subprocess.run(["git", "commit", "-q", "-m", "AIRoot base"], cwd=airroot, check=True)
+        airroot_head = subprocess.check_output(
+            ["git", "rev-parse", "HEAD"], cwd=airroot, text=True
+        ).strip()
+        subprocess.run(
+            ["git", "update-index", "--add", "--cacheinfo", f"160000,{airroot_head},AIRoot"],
+            cwd=root,
+            check=True,
+        )
+        subprocess.run(["git", "commit", "-q", "-m", "mount AIRoot"], cwd=root, check=True)
+
+        configured = (
+            {
+                Path("AIRoot"): ("AGENTS.md",),
+                Path("AIRoot") / nested_relative: ("AGENTS.md",),
+            },
+            {
+                Path("."): ("AIRoot",),
+                Path("AIRoot"): (nested_relative,),
+            },
+        )
+        with mock.patch.object(harness_stop, "configured_paths", return_value=configured):
+            (mcp / "ordinary-runtime.cs").write_text("owner dirt\n", encoding="utf-8")
+            self.assertEqual([], harness_stop.changed_harness_paths(root))
+            (mcp / "ordinary-runtime.cs").unlink()
+
+            (mcp / "AGENTS.md").write_text("changed router\n", encoding="utf-8")
+            self.assertEqual(
+                [f"AIRoot/{nested_relative}:AGENTS.md"],
+                harness_stop.changed_harness_paths(root),
+            )
+            (mcp / "AGENTS.md").write_text("MCP router\n", encoding="utf-8")
+
+            (mcp / "runtime.txt").write_text("new MCP head\n", encoding="utf-8")
+            subprocess.run(["git", "add", "runtime.txt"], cwd=mcp, check=True)
+            subprocess.run(["git", "commit", "-q", "-m", "advance MCP"], cwd=mcp, check=True)
+            self.assertEqual(
+                [f"AIRoot:{nested_relative}"],
+                harness_stop.changed_harness_paths(root),
+            )
+
+            advanced_head = subprocess.check_output(
+                ["git", "rev-parse", "HEAD"], cwd=mcp, text=True
+            ).strip()
+            subprocess.run(
+                [
+                    "git", "update-index", "--cacheinfo",
+                    f"160000,{advanced_head},{nested_relative}",
+                ],
+                cwd=airroot,
+                check=True,
+            )
+            self.assertEqual(
+                [f"AIRoot:{nested_relative}"],
+                harness_stop.changed_harness_paths(root),
+            )
 
     def test_product_marketing_generated_build_log_and_release_evidence_no_op(self) -> None:
         paths = (

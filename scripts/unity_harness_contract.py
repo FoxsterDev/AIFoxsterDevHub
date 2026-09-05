@@ -728,3 +728,19 @@ def legacy_active_path_failures(root: Path) -> list[str]:
                 f"active file contains removed Connectivity names {markers}: {relative}"
             )
     return failures
+
+
+def workspace_topology_mirror_failures(root: Path, topology: dict[str, Any]) -> list[str]:
+    workspace = root / "WORKSPACE.md"
+    if not workspace.is_file():
+        return ["WORKSPACE.md is missing"]
+    text = workspace.read_text(encoding="utf-8")
+    expected = [record.get("path", "") for record in topology.get("projects", [])]
+    expected.extend(
+        record.get("path", "") for record in topology.get("optional_projects", [])
+    )
+    return [
+        f"WORKSPACE.md does not mirror topology project path: {path}"
+        for path in expected
+        if path and f"`{path}`" not in text
+    ]

@@ -20,6 +20,7 @@ from unity_harness_contract import (
     route_contract_failures,
     validate_mcp_contract,
     validate_topology,
+    workspace_topology_mirror_failures,
 )
 
 
@@ -160,6 +161,8 @@ def main() -> int:
     checks.append("canonical-router-case")
 
     if topology:
+        failures.extend(workspace_topology_mirror_failures(ROOT, topology))
+        checks.append("workspace-topology-mirror")
         failures.extend(route_contract_failures(ROOT, topology))
         checks.append("conditional-routes-and-fallbacks")
         try:

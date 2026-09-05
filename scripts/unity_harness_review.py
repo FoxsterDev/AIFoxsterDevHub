@@ -26,12 +26,6 @@ BASE_RE = re.compile(r"[0-9a-f]{40}(?:[0-9a-f]{24})?")
 FINGERPRINT_RE = re.compile(r"sha256:[0-9a-f]{64}")
 REPOSITORY_RE = re.compile(r"Review repository: id=([A-Za-z0-9._-]+); path=(.+)")
 REVIEWER_RE = re.compile(r"Reviewer context: (.+); reviewer authored the reviewed diff: (yes|no)\.")
-ROOT_STATUS_ONLY_PATHS = {
-    "AIOutput/Harness/current-handoff.md",
-    "AIOutput/Harness/validation-evidence-2026-09-02.md",
-}
-
-
 @dataclass(frozen=True)
 class ReviewScope:
     identity: str
@@ -320,10 +314,6 @@ def validate_outcome(
         except (OSError, ValueError) as error:
             errors.append(f"{scope.identity}: cannot resolve committed review diff: {error}")
             continue
-        if scope.identity == "root":
-            committed_paths = tuple(
-                path for path in committed_paths if path not in ROOT_STATUS_ONLY_PATHS
-            )
         if scope.paths != committed_paths:
             errors.append(
                 f"{scope.identity}: scoped paths do not equal committed diff; "
