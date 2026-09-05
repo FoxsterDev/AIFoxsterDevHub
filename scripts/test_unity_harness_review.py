@@ -225,6 +225,21 @@ class HarnessReviewTests(unittest.TestCase):
         errors = validate_outcome(record, lane="high-risk")
         self.assertTrue(any("fingerprint" in error for error in errors))
 
+    def test_committed_alternate_blob_with_unchanged_worktree_invalidates_scope(self) -> None:
+        repo, base = self.make_repo("alternate-blob")
+        scope = self.scope("root", repo, base, ["tracked.txt"])
+        record = self.record([scope])
+
+        alternate = repo / "alternate.txt"
+        alternate.write_text("unreviewed committed bytes\n", encoding="utf-8")
+        alternate_oid = git(repo, "hash-object", "-w", "alternate.txt")
+        git(repo, "update-index", "--cacheinfo", f"100644,{alternate_oid},tracked.txt")
+        git(repo, "commit", "-q", "-m", "commit alternate index blob")
+
+        self.assertEqual("reviewed change\n", (repo / "tracked.txt").read_text(encoding="utf-8"))
+        errors = validate_outcome(record, lane="high-risk")
+        self.assertTrue(any("fingerprint" in error for error in errors))
+
     def test_committed_scope_cannot_omit_an_ordinary_changed_file(self) -> None:
         repo, base = self.make_repo("omitted-file")
         (repo / "second.txt").write_text("second\n", encoding="utf-8")

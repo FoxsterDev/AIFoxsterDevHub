@@ -158,6 +158,21 @@ def _index_entry(repo: Path, relative: str) -> tuple[str, str] | None:
     return match.group(1), match.group(2)
 
 
+def _tree_entry(repo: Path, relative: str) -> tuple[str, str, str] | None:
+    output = _git(repo, "ls-tree", "HEAD", "--", relative)
+    if not output:
+        return None
+    lines = output.splitlines()
+    if len(lines) != 1:
+        raise ValueError(f"review path has ambiguous HEAD tree entries: {relative!r}")
+    match = re.fullmatch(
+        r"([0-7]{6}) (blob|commit|tree) ([0-9a-f]{40,64})\t.+", lines[0]
+    )
+    if not match:
+        raise ValueError(f"cannot parse HEAD tree entry for {relative!r}: {lines[0]!r}")
+    return match.group(1), match.group(2), match.group(3)
+
+
 def _committed_diff_paths(repo: Path, base: str) -> tuple[str, ...]:
     output = _git(repo, "diff", "--name-only", "--no-renames", f"{base}...HEAD", "--")
     paths = tuple(sorted({line for line in output.splitlines() if line}))
@@ -168,13 +183,10 @@ def _committed_diff_paths(repo: Path, base: str) -> tuple[str, ...]:
 
 
 def _tree_gitlink(repo: Path, relative: str) -> str | None:
-    output = _git(repo, "ls-tree", "HEAD", "--", relative)
-    if not output:
+    entry = _tree_entry(repo, relative)
+    if entry is None or entry[0] != "160000" or entry[1] != "commit":
         return None
-    match = re.fullmatch(r"160000 commit ([0-9a-f]{40,64})\t.+", output)
-    if match is None:
-        return None
-    return match.group(1)
+    return entry[2]
 
 
 def scope_fingerprint(repo: Path, base: str, paths: list[str] | tuple[str, ...]) -> tuple[str, str]:
@@ -188,7 +200,7 @@ def scope_fingerprint(repo: Path, base: str, paths: list[str] | tuple[str, ...])
         raise ValueError("; ".join(errors))
 
     hasher = hashlib.sha256()
-    _feed(hasher, b"unity-harness-review-scope-v3")
+    _feed(hasher, b"unity-harness-review-scope-v4")
     _feed(hasher, base_oid.encode())
     for relative in normalized:
         candidate = repo / relative
@@ -199,12 +211,28 @@ def scope_fingerprint(repo: Path, base: str, paths: list[str] | tuple[str, ...])
         exists_now = candidate.exists() or candidate.is_symlink()
         existed_at_base = _base_has_path(repo, base_oid, relative)
         index_entry = _index_entry(repo, relative)
+        tree_entry = _tree_entry(repo, relative)
         if not exists_now and not existed_at_base and index_entry is None:
             raise ValueError(f"review path is absent now and at base: {relative!r}")
         _feed(hasher, relative.encode())
-        if index_entry and index_entry[0] == "160000":
+        _feed(hasher, b"head-entry")
+        if tree_entry is None:
+            _feed(hasher, b"absent")
+        else:
+            for value in tree_entry:
+                _feed(hasher, value.encode())
+        _feed(hasher, b"index-entry")
+        if index_entry is None:
+            _feed(hasher, b"absent")
+        else:
+            for value in index_entry:
+                _feed(hasher, value.encode())
+        is_gitlink = (
+            (index_entry is not None and index_entry[0] == "160000")
+            or (tree_entry is not None and tree_entry[0] == "160000")
+        )
+        if is_gitlink:
             _feed(hasher, b"gitlink")
-            _feed(hasher, index_entry[1].encode())
             if not exists_now:
                 _feed(hasher, b"checkout-absent")
                 continue
