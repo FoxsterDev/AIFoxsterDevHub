@@ -1,7 +1,7 @@
 Readiness: owner-QA-ready
-Independent acceptance: PENDING FINAL REVIEW
-Accept as complete: pending final non-author review
-Next required action: Freeze and independently review the post-policy diff and live Unity evidence; no owner action is required.
+Independent acceptance: PASS
+Accept as complete: yes
+Next required action: none
 Reviewer context: `/root/final_diff_reviewer`; reviewer authored the reviewed diff: no.
 Proof blockers: None for the declared `compiled` consumer ceiling. EditMode, PlayMode, player-build, device, store, and product-release claims remain outside this acceptance scope.
 
@@ -130,6 +130,13 @@ absolute repository identity, duplicate YAML sections, context denominators,
 nested gitlink dirt, WORKSPACE mirrors, status-scope exclusions, and ordinary
 HEAD/index binding. At implementation head `d1d4b831...` the reviewer reported
 no remaining Hub-owned static implementation finding.
+
+The same non-author reviewer later validated the frozen post-policy scopes at
+root `04e9d21b306fc91fbdb71a7f2fa79e59fc9739b3`, AIRoot `517493ef...`, CCP
+`5c7d320...`, DAS `c4bbbf3...`, and MCP `facc2081...`, including all four
+committed gitlink relations and the live Unity evidence, and returned PASS with
+no Hub-owned implementation finding. This status-only outcome update is the
+only root change after that reviewed snapshot.
 
 ## Latest MCP Decision
 
