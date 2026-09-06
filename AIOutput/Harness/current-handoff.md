@@ -3,7 +3,8 @@ Independent acceptance: PASS
 Accept as complete: yes
 Next required action: none
 Reviewer context: `/root/final_diff_reviewer`; reviewer authored the reviewed diff: no.
-Proof blockers: None for the declared `compiled` consumer ceiling. EditMode, PlayMode, player-build, device, store, and product-release claims remain outside this acceptance scope.
+Proof blockers: none
+Proof ceiling: Exact package resolution plus `CompilePlayerScripts`; EditMode, PlayMode, player-build, device, store, and product-release claims remain outside this acceptance scope.
 
 # Current Unity Harness Handoff
 
