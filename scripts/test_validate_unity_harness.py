@@ -30,6 +30,19 @@ class RootGateContractTests(unittest.TestCase):
             line for line in validator.splitlines() if "privacy-structure" in line
         )
         self.assertNotIn("--require-host-opt-out", privacy_command)
+        self.assertNotIn("--require-launch-authority", privacy_command)
+
+    def test_active_launch_instructions_do_not_advertise_removed_analytics_gate(self) -> None:
+        root = Path(__file__).resolve().parents[1]
+        active_instructions = (
+            root / "AGENTS.md",
+            root / "AIOutput/Harness/KERNEL.md",
+            root
+            / "ConnectivityCheckerPro/CCP_PUB/Assets/AIOutput/START_PROMPT_CONNECTIVITY_CHECKER_PRO_REFRESH_DISTRIBUTION.md",
+        )
+        for path in active_instructions:
+            with self.subTest(path=path):
+                self.assertNotIn("--require-host-opt-out", path.read_text(encoding="utf-8"))
 
     def test_stop_subset_executes_route_mutations(self) -> None:
         validator = Path(__file__).with_name("validate-unity-harness.py").read_text(encoding="utf-8")

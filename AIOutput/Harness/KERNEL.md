@@ -46,11 +46,11 @@ explicit; they never become passing claims.
 
 ## Privacy And Launch Authority
 
-`python3 scripts/validate-unity-privacy.py` owns deterministic repository
-privacy structure. Immediately before Unity, add `--require-host-opt-out` to
-check host Editor/Hub launch authority. A red host result forbids Unity and its
-claims, but does not falsify docs-only topology or static Harness checks. Never
-change host preferences or Hub records without explicit owner authorization.
+`python3 scripts/validate-unity-privacy.py` owns deterministic repository privacy.
+Immediately before Unity, add `--require-launch-authority` to reject Hub projects
+with Cloud identity. Editor Analytics is not a launch blocker for this account.
+A red Hub result forbids Unity claims, not static Harness checks. The validator
+never mutates host preferences or Hub records.
 
 ## Outcome And Independent Acceptance
 

@@ -27,7 +27,7 @@ Use it to select shared prompt families, define load order, and route project-lo
 - Use host-local protocol families only when the host intentionally attaches them under `AIModules/`.
 - For tasks under `AIRoot/Operations/XUUnityLightUnityMcp/`, route to its child-owned exact `AIRoot/Operations/XUUnityLightUnityMcp/AGENTS.md` before project-specific work. This independently versioned tooling satellite remains standalone-capable; the host only augments it when available.
 - For tasks under `AIRoot/Operations/XUUnityLightUnityMcp/docs/clients/`, route through the MCP project router first, then the local client-docs router in that folder.
-- Resolve active projects and Git boundaries from `AIOutput/Registry/host_topology.yaml`. Run `python3 scripts/validate-unity-privacy.py --require-host-opt-out` immediately before any Unity launch; a red host check blocks Unity, not static routing work.
+- Resolve active projects and Git boundaries from `AIOutput/Registry/host_topology.yaml`. Run `python3 scripts/validate-unity-privacy.py --require-launch-authority` immediately before any Unity launch; a red Hub Cloud-identity check blocks Unity, not static routing work. Editor Analytics is not a launch blocker for this account.
 
 ## Fast Shortcuts
 - `xuunity fix this bug`

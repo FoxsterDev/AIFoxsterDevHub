@@ -5,8 +5,6 @@ from __future__ import annotations
 
 import argparse
 import json
-import platform
-import subprocess
 import sys
 from pathlib import Path
 
@@ -143,22 +141,6 @@ def privacy_projects(root: Path) -> tuple[list[dict[str, str]], list[str]]:
     return selected, failures
 
 
-def check_editor_analytics() -> list[str]:
-    if platform.system() != "Darwin":
-        return ["host: Editor Analytics opt-out can only be proven automatically on macOS"]
-    failures = []
-    for key in ("EnableEditorAnalytics", "EnableEditorAnalyticsV2"):
-        result = subprocess.run(
-            ["defaults", "read", "com.unity3d.UnityEditor5.x", key],
-            check=False,
-            capture_output=True,
-            text=True,
-        )
-        if result.returncode != 0 or result.stdout.strip() != "0":
-            failures.append(f"host: {key} is not disabled")
-    return failures
-
-
 def check_hub_records(root: Path) -> list[str]:
     database = Path.home() / "Library/Application Support/UnityHub/projects-v1.json"
     if not database.is_file():
@@ -176,15 +158,14 @@ def check_hub_records(root: Path) -> list[str]:
     return failures
 
 
-def evaluate(root: Path, require_host_opt_out: bool) -> tuple[dict, int]:
+def evaluate(root: Path, require_launch_authority: bool) -> tuple[dict, int]:
     projects, repository_failures = privacy_projects(root)
     for record in projects:
         repository_failures.extend(check_project(root, record["path"], record["id"]))
 
     host_failures: list[str] = []
     authority = "not-evaluated"
-    if require_host_opt_out:
-        host_failures.extend(check_editor_analytics())
+    if require_launch_authority:
         host_failures.extend(check_hub_records(root))
         authority = "blocked" if host_failures else "ready"
 
@@ -199,7 +180,8 @@ def evaluate(root: Path, require_host_opt_out: bool) -> tuple[dict, int]:
         },
         "unity_launch_authority": {
             "status": authority,
-            "host_opt_out_checked": require_host_opt_out,
+            "launch_authority_checked": require_launch_authority,
+            "editor_analytics_blocking": False,
             "failures": host_failures,
         },
     }
@@ -209,9 +191,14 @@ def evaluate(root: Path, require_host_opt_out: bool) -> tuple[dict, int]:
 def main() -> int:
     parser = argparse.ArgumentParser()
     parser.add_argument("--root", type=Path, default=Path(__file__).resolve().parents[1])
-    parser.add_argument("--require-host-opt-out", action="store_true")
+    parser.add_argument(
+        "--require-launch-authority",
+        dest="require_launch_authority",
+        action="store_true",
+        help="check Hub project Cloud identity before launching Unity",
+    )
     args = parser.parse_args()
-    result, code = evaluate(args.root.resolve(), args.require_host_opt_out)
+    result, code = evaluate(args.root.resolve(), args.require_launch_authority)
     print(json.dumps(result, indent=2, sort_keys=True))
     return code
 
