@@ -163,7 +163,7 @@ documentation/hygiene release; they are not functional or live-proof success.
 | --- | --- |
 | `python3 -B scripts/validate-unity-harness.py` | PASS, full-static, 23 named checks, v0.3.72 consumers 7/7 |
 | `python3 -B scripts/validate-unity-harness.py --stop` | PASS, bounded static subset, 19 named checks |
-| Root Harness mutation/unit suite | 43/43 PASS |
+| Root Harness mutation/unit suite | 45/45 PASS |
 | Stop-hook suite | 12/12 PASS |
 | Frozen evaluator unit suite | 25/25 PASS |
 | Frozen evaluator score | 10/10 PASS |
@@ -233,18 +233,18 @@ Lines are advisory; bytes are the hard limit.
 
 | Scenario | Lines | Bytes / hard ceiling | Result |
 | --- | ---: | ---: | --- |
-| Hub root | 149 | 8,514 / 12,000 | PASS |
+| Hub root | 149 | 8,575 / 12,000 | PASS |
 | AIRoot | 39 | 1,918 / 3,000 | PASS |
 | CCP root | 211 | 9,620 / 10,000 | PASS with line warning (>200) |
 | CCP consumer | 233 | 10,578 / 12,000 | PASS with line warning (>230) |
 | DAS root | 280 | 12,710 / 14,000 | PASS |
 | DAS demo | 313 | 14,089 / 16,000 | PASS |
 | MCP standalone | 63 | 6,983 / 9,000 | PASS |
-| MCP host-mounted | 251 | 17,415 / 21,000 | PASS |
+| MCP host-mounted | 251 | 17,476 / 21,000 | PASS |
 
 | Document | Lines | Bytes / hard ceiling | Result |
 | --- | ---: | ---: | --- |
-| Hub kernel | 80 | 3,874 / 4,096 | PASS |
+| Hub kernel | 80 | 3,858 / 4,096 | PASS |
 | Change delivery protocol | 246 | 13,936 / 24,576 | PASS |
 | Compact impact review | 66 | 3,469 / 8,192 | PASS |
 
