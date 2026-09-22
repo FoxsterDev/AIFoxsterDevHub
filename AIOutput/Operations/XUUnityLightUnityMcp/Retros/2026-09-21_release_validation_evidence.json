@@ -1,0 +1,285 @@
+{
+  "date": "2026-09-21",
+  "selection": "Purposive six saved final helper responses; not a session census or reliability benchmark",
+  "records": [
+    {
+      "id": "E01",
+      "path": "/Users/siarheikha/Projects/FoxsterDev/AIFoxsterDevHub/ConnectivityCheckerPro/release/evidence/1.2.2/final-lifecycle/2022-request-editmode-tests-0.json",
+      "sha256": "31bb3c514d2476b5cf43cb4afd292fe9894db2630545c73fad9296d23eeb1a25",
+      "bytes": 18368,
+      "request_id": "53482ec8-5b2c-490e-b4cd-c1fae429eb97",
+      "envelope_status": "ok",
+      "payload": {
+        "status": "passed",
+        "test_verdict": "passed",
+        "total": 1,
+        "passed": 1,
+        "failed": 0,
+        "completion_basis": "unity_test_runner_callbacks",
+        "lifecycle_churn_observed": false,
+        "post_settle_error_count": 0
+      }
+    },
+    {
+      "id": "E02",
+      "path": "/Users/siarheikha/Projects/FoxsterDev/AIFoxsterDevHub/ConnectivityCheckerPro/release/evidence/1.2.2/final-lifecycle/2022-request-editmode-tests-1.json",
+      "sha256": "645ac2a6528d0df72e58191fb5419be855791f8acb7ba17dad76cbe082119e0a",
+      "bytes": 18435,
+      "request_id": "c1b1d2ae-092d-4dc3-a486-38a9aed99897",
+      "envelope_status": "ok",
+      "payload": {
+        "status": "passed",
+        "test_verdict": "passed",
+        "total": 1,
+        "passed": 1,
+        "failed": 0,
+        "completion_basis": "unity_test_runner_callbacks",
+        "lifecycle_churn_observed": false,
+        "post_settle_error_count": 0
+      }
+    },
+    {
+      "id": "E03",
+      "path": "/Users/siarheikha/Projects/FoxsterDev/AIFoxsterDevHub/ConnectivityCheckerPro/release/evidence/1.2.2/final-lifecycle/6000-6-request-editmode-tests-0.json",
+      "sha256": "6c7b389050e3a2a00883284f63d686dcd6b778fdb80c46f6e19e1c8decd2001b",
+      "bytes": 17450,
+      "request_id": "a2c579b8-e026-43c6-b312-691a834b0b91",
+      "envelope_status": "ok",
+      "payload": {
+        "status": "passed",
+        "test_verdict": "passed",
+        "total": 1,
+        "passed": 1,
+        "failed": 0,
+        "completion_basis": "unity_test_runner_callbacks",
+        "lifecycle_churn_observed": false,
+        "post_settle_error_count": 0
+      }
+    },
+    {
+      "id": "E04",
+      "path": "/Users/siarheikha/Projects/FoxsterDev/AIFoxsterDevHub/ConnectivityCheckerPro/release/evidence/1.2.2/final-lifecycle/6000-6-request-editmode-tests-1.json",
+      "sha256": "3c17f3fdfbff9429ee7a9bfb7b98998533a69c6de0e8df0ddcb9b77f473a5bfa",
+      "bytes": 17519,
+      "request_id": "e4bc6547-b2fa-42d5-9a04-72ab472ead06",
+      "envelope_status": "ok",
+      "payload": {
+        "status": "passed",
+        "test_verdict": "passed",
+        "total": 1,
+        "passed": 1,
+        "failed": 0,
+        "completion_basis": "unity_test_runner_callbacks",
+        "lifecycle_churn_observed": false,
+        "post_settle_error_count": 0
+      }
+    },
+    {
+      "id": "E05",
+      "path": "/Users/siarheikha/Projects/FoxsterDev/AIFoxsterDevHub/ConnectivityCheckerPro/release/evidence/warning-cleanliness/user-project-compile.json",
+      "sha256": "00772fe40c06f23c7266eff209d10269c1d51cb2e9f98b071901674e10533be1",
+      "bytes": 14643,
+      "request_id": "dfb9053e-fe67-463f-b86d-4c6a5ca113f7",
+      "envelope_status": "ok",
+      "payload": {
+        "completion_basis": "unity_compile_settle_watcher",
+        "post_settle_error_count": 0,
+        "compile_result": {
+          "status": "passed",
+          "target": "StandaloneOSX",
+          "warning_count": 0,
+          "error_count": 0,
+          "rebuilt_assembly_count": 45,
+          "cached_assembly_count": 99,
+          "rebuild_evidence_status": "measured"
+        }
+      }
+    },
+    {
+      "id": "E06",
+      "path": "/Users/siarheikha/Projects/FoxsterDev/AIFoxsterDevHub/ConnectivityCheckerPro/release/evidence/1.2.2/manual-update/user-project-mcp-playmode.json",
+      "sha256": "503e54cf3d60d25d3b1dc86a3030b3d27a6216ec520341175a89cbb697f592d9",
+      "bytes": 16320,
+      "request_id": "3c7650c8-1722-404a-a10e-775f242a78a2",
+      "envelope_status": "ok",
+      "payload": {
+        "status": "passed",
+        "test_verdict": "passed",
+        "total": 1,
+        "passed": 1,
+        "failed": 0,
+        "completion_basis": "unity_test_runner_callbacks",
+        "lifecycle_churn_observed": false,
+        "post_settle_error_count": 0
+      }
+    },
+    {
+      "id": "E07",
+      "path": "/Users/siarheikha/Projects/FoxsterDev/AIFoxsterDevHub/ConnectivityCheckerPro/release/evidence/1.2.2/release-verdict.json",
+      "sha256": "32e204abfaf81d01748671f615a2d07d3fe62e586e1de2e09ab3214f4ff57cb1",
+      "bytes": 166823,
+      "status": "BLOCKED"
+    },
+    {
+      "id": "E08",
+      "path": "/Users/siarheikha/Projects/FoxsterDev/AIFoxsterDevHub/ConnectivityCheckerPro/release/evidence/warning-cleanliness/sample-e2e.json",
+      "sha256": "fd6d43be1ee3273a9c769c0d39f8071526151d79d57c5878a036482df1d12f63",
+      "bytes": 19900,
+      "status": "FAIL"
+    },
+    {
+      "id": "E09",
+      "path": "/Users/siarheikha/Projects/FoxsterDev/AIFoxsterDevHub/ConnectivityCheckerPro/release/evidence/warning-cleanliness/final-sample-e2e.json",
+      "sha256": "c9064222dd58f07a6676e9440b75f308126015f66210bf7a42691b1cbc16832a",
+      "bytes": 20091,
+      "status": "PASS"
+    },
+    {
+      "id": "E10",
+      "path": "/Users/siarheikha/Projects/FoxsterDev/AIFoxsterDevHub/ConnectivityCheckerPro/release/evidence/warning-cleanliness/negative-control.json",
+      "sha256": "f0a8f237f945b3769956e34d2554acefb3dd64fe5450a7f700c4a02504903fa2",
+      "bytes": 2085,
+      "status": "FAIL"
+    }
+  ],
+  "journal_events": [
+    {
+      "path": "/Users/siarheikha/Projects/FoxsterDev/Samples/unity6_6_test_cpp/Library/XUUnityLightMcp/journal/requests/20260921T020736403Z_6f188ba16fef43138220d531d06c9693_request_submitted.json",
+      "sha256": "e491f636373d8438c2a75657e387427044d125de4f08cc829e186f7a061ed353",
+      "request_id": "3c7650c8-1722-404a-a10e-775f242a78a2",
+      "event_type": "request_submitted",
+      "event_source": "host_wrapper",
+      "operation_status": null,
+      "test_verdict": null,
+      "client_kind": "cli",
+      "host_delivery_observed": null,
+      "event_at_utc": "2026-09-21T02:07:36Z"
+    },
+    {
+      "path": "/Users/siarheikha/Projects/FoxsterDev/Samples/unity6_6_test_cpp/Library/XUUnityLightMcp/journal/requests/20260921T020736431Z_d79f9c050b374c49b28a179a13c8b043_request_started.json",
+      "sha256": "1eaf45b99d11a76a55b86ed2d84bea34ac493d07ea6246eeddb37dcdbcb58003",
+      "request_id": "3c7650c8-1722-404a-a10e-775f242a78a2",
+      "event_type": "request_started",
+      "event_source": "unity_bridge",
+      "operation_status": "",
+      "test_verdict": "",
+      "client_kind": null,
+      "host_delivery_observed": null,
+      "event_at_utc": "2026-09-21T02:07:36Z"
+    },
+    {
+      "path": "/Users/siarheikha/Projects/FoxsterDev/Samples/unity6_6_test_cpp/Library/XUUnityLightMcp/journal/requests/20260921T020737300Z_03955315396144c4aa840fe35016fcf7_request_completed.json",
+      "sha256": "d0a8f910073e132dcd5d315aa8a97fb4f6d27625192c250db507308f58fb79fc",
+      "request_id": "3c7650c8-1722-404a-a10e-775f242a78a2",
+      "event_type": "request_completed",
+      "event_source": "unity_bridge",
+      "operation_status": "ok",
+      "test_verdict": "passed",
+      "client_kind": null,
+      "host_delivery_observed": null,
+      "event_at_utc": "2026-09-21T02:07:37Z"
+    },
+    {
+      "path": "/Users/siarheikha/Projects/FoxsterDev/Samples/unity6_6_test_cpp/Library/XUUnityLightMcp/journal/requests/20260921T020737301Z_e1a327b056ba42f79f676e457ed82cf3_request_delivery_observed.json",
+      "sha256": "0f293ae188932e50db98600c15583133b5cf7b86a39446a49d41b4802af05615",
+      "request_id": "3c7650c8-1722-404a-a10e-775f242a78a2",
+      "event_type": "request_delivery_observed",
+      "event_source": "host_wrapper",
+      "operation_status": null,
+      "test_verdict": null,
+      "client_kind": "cli",
+      "host_delivery_observed": true,
+      "event_at_utc": "2026-09-21T02:07:37Z"
+    },
+    {
+      "path": "/Users/siarheikha/Projects/FoxsterDev/Samples/unity6_6_test_cpp/Library/XUUnityLightMcp/journal/requests/20260921T020737302Z_9bedb2dc74934e10a2ad458fc20ef6d6_operation_progress.json",
+      "sha256": "d73c215fe3cd92f0b974de93b8ad1b02d022557f84e616cd1a2156a0aaeb4946",
+      "request_id": "3c7650c8-1722-404a-a10e-775f242a78a2",
+      "event_type": "operation_progress",
+      "event_source": "host_wrapper",
+      "operation_status": null,
+      "test_verdict": null,
+      "client_kind": "cli",
+      "host_delivery_observed": null,
+      "event_at_utc": "2026-09-21T02:07:37Z"
+    },
+    {
+      "path": "/Users/siarheikha/Projects/FoxsterDev/Samples/unity6_6_test_cpp/Library/XUUnityLightMcp/journal/requests/20260921T095332082Z_f928ab93979345fbbfa9dc42d65b727f_request_submitted.json",
+      "sha256": "d628ac2f6ebce4b779ec20855d316badcbef10724c38081765bf8c3ca5053c37",
+      "request_id": "dfb9053e-fe67-463f-b86d-4c6a5ca113f7",
+      "event_type": "request_submitted",
+      "event_source": "host_wrapper",
+      "operation_status": null,
+      "test_verdict": null,
+      "client_kind": "cli",
+      "host_delivery_observed": null,
+      "event_at_utc": "2026-09-21T09:53:32Z"
+    },
+    {
+      "path": "/Users/siarheikha/Projects/FoxsterDev/Samples/unity6_6_test_cpp/Library/XUUnityLightMcp/journal/requests/20260921T095332514Z_f5a909830ab54a0e98e97d965b0cfe4f_request_started.json",
+      "sha256": "1a9d6e0e00975f54d5156b1cdbcdcfec2e87224c59f548673147d44bc86bdb62",
+      "request_id": "dfb9053e-fe67-463f-b86d-4c6a5ca113f7",
+      "event_type": "request_started",
+      "event_source": "unity_bridge",
+      "operation_status": "",
+      "test_verdict": "",
+      "client_kind": null,
+      "host_delivery_observed": null,
+      "event_at_utc": "2026-09-21T09:53:32Z"
+    },
+    {
+      "path": "/Users/siarheikha/Projects/FoxsterDev/Samples/unity6_6_test_cpp/Library/XUUnityLightMcp/journal/requests/20260921T095335565Z_093ec9a5300b48bcb752dc55c62f69c8_request_delivery_observed.json",
+      "sha256": "6c53ccd75bff4d6124b97f576d150d9156b31eeb44d3594f5f606e95b1500f98",
+      "request_id": "dfb9053e-fe67-463f-b86d-4c6a5ca113f7",
+      "event_type": "request_delivery_observed",
+      "event_source": "host_wrapper",
+      "operation_status": null,
+      "test_verdict": null,
+      "client_kind": "cli",
+      "host_delivery_observed": true,
+      "event_at_utc": "2026-09-21T09:53:35Z"
+    },
+    {
+      "path": "/Users/siarheikha/Projects/FoxsterDev/Samples/unity6_6_test_cpp/Library/XUUnityLightMcp/journal/requests/20260921T095335565Z_81f50eed046e4949a371d20e62448463_request_completed.json",
+      "sha256": "97f9fcf79fd605df34371641ac833ae534562e08e50c222fae0b4e8763aa5db4",
+      "request_id": "dfb9053e-fe67-463f-b86d-4c6a5ca113f7",
+      "event_type": "request_completed",
+      "event_source": "unity_bridge",
+      "operation_status": "ok",
+      "test_verdict": "",
+      "client_kind": null,
+      "host_delivery_observed": null,
+      "event_at_utc": "2026-09-21T09:53:35Z"
+    },
+    {
+      "path": "/Users/siarheikha/Projects/FoxsterDev/Samples/unity6_6_test_cpp/Library/XUUnityLightMcp/journal/requests/20260921T095335566Z_236be759198040bb9527eacff1a94844_operation_progress.json",
+      "sha256": "9a9041a898e3a230c746a9794fdd0c7cbc767dd19a25f279cb457ef0192a821f",
+      "request_id": "dfb9053e-fe67-463f-b86d-4c6a5ca113f7",
+      "event_type": "operation_progress",
+      "event_source": "host_wrapper",
+      "operation_status": null,
+      "test_verdict": null,
+      "client_kind": "cli",
+      "host_delivery_observed": null,
+      "event_at_utc": "2026-09-21T09:53:35Z"
+    }
+  ],
+  "bridge_state": {
+    "path": "/Users/siarheikha/Projects/FoxsterDev/Samples/unity6_6_test_cpp/Library/XUUnityLightMcp/state/bridge_state.json",
+    "sha256": "469c69f48bcf2e02827fae185f1dd76172a66ecc67e8c2ed19e1144cc2b1d92d",
+    "scope": "Later snapshot; not historical completion evidence",
+    "bridge_version": 11,
+    "unity_version": "6000.6.0b3",
+    "heartbeat_utc": "2026-09-21T19:01:25Z",
+    "bridge_generation": 10,
+    "health_status": "healthy",
+    "is_compiling": false,
+    "is_playing": false
+  },
+  "limitations": [
+    "Native MCP client wiring not proven",
+    "No request-loss/reconnect fault injection",
+    "Transcript-only incidents are not journal-certified",
+    "Full transcript token and polling counts unavailable"
+  ]
+}
