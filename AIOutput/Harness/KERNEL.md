@@ -11,7 +11,8 @@ queue, daemon, or task store:
 
 Load the root and nearest `AGENTS.md`, this kernel, and the selected adapter.
 Load project memory only for the target. Satellites work without the Hub or
-private overlay. Public Unity rules belong in `AIRoot/Modules/XUUnity/`; the
+private overlay. MCP validation follows `AIOutput/Harness/mcp-contract.md`.
+Public Unity rules belong in `AIRoot/Modules/XUUnity/`; the
 topology owner is `AIOutput/Registry/host_topology.yaml`.
 
 ## Lanes
@@ -71,7 +72,6 @@ unrelated dirt does not. Pending or REVISE is never ready/complete. PASS cannot
 erase a missing Unity, consumer, platform, device, owner, or release gate.
 
 ## Finish And Maintenance
-
 The scoped Stop hook is static-only, bounded, owner-trusted, fail-open on faults,
 and a no-op for product/generated/build/log/marketing paths; it never runs Unity.
 

@@ -450,7 +450,7 @@ def validate_consumer_pin(project: Path, expected_url: str, expected_hash: str) 
     return errors
 
 
-def validate_mcp_contract(root: Path, topology: dict[str, Any]) -> tuple[dict[str, Any], list[str]]:
+def validate_mcp_contract(root: Path, topology: dict[str, Any], *, release: bool = False) -> tuple[dict[str, Any], list[str]]:
     failures: list[str] = []
     boundaries = boundary_map(topology)
     for record in topology["boundaries"]:
@@ -468,28 +468,42 @@ def validate_mcp_contract(root: Path, topology: dict[str, Any]) -> tuple[dict[st
     mcp_record = boundaries.get("MCP", {})
     mcp = root / mcp_record.get("path", "AIRoot/Operations/XUUnityLightUnityMcp")
     head = run_git(mcp, "rev-parse", "HEAD")
-    package = load_json(mcp / "packages/com.xuunity.light-mcp/package.json")
-    version = package.get("version")
-    if not isinstance(version, str) or not re.fullmatch(r"\d+\.\d+\.\d+", version):
-        failures.append(f"MCP package version is not stable semver: {version!r}")
-        version = "invalid"
-    try:
-        tag = select_release_tag(run_git(mcp, "tag", "--points-at", "HEAD").splitlines(), version)
-    except ValueError as error:
-        failures.append(str(error))
-        tag = f"v{version}"
+    baseline = load_json(root / "AIOutput/Harness/mcp-release-baseline.json")
+    tag = baseline.get("tag")
+    release_commit = baseline.get("commit")
+    if (baseline.get("schema_version") != 1
+            or not isinstance(tag, str) or not re.fullmatch(r"v\d+\.\d+\.\d+", tag)
+            or not isinstance(release_commit, str) or not re.fullmatch(r"[0-9a-f]{40}", release_commit)):
+        raise ValueError("invalid MCP release baseline: require schema 1, stable tag and full commit SHA")
+    version = tag[1:]
+    package_path = "packages/com.xuunity.light-mcp/package.json"
+    checkout_version = load_json(mcp / package_path).get("version")
     tag_object = "unresolved"
     try:
         tag_reference = f"refs/tags/{tag}"
         tag_object = run_git(mcp, "rev-parse", tag_reference)
         tag_type = run_git(mcp, "cat-file", "-t", tag_reference)
-        peeled = run_git(mcp, "rev-parse", f"{tag_reference}^{{}}")
-        if tag_type != "tag" or peeled != head:
+        peeled = run_git(mcp, "rev-parse", f"{tag_reference}^{{commit}}")
+        if tag_type != "tag" or peeled != release_commit:
             failures.append(
-                f"MCP release tag {tag} is not annotated and peeled to HEAD: type={tag_type}, peeled={peeled}, head={head}"
+                f"MCP release baseline mismatch: tag={tag}, type={tag_type}, "
+                f"peeled={peeled}, expected={release_commit}"
             )
-    except ValueError as error:
+        tagged_package = json.loads(run_git(mcp, "show", f"{tag_reference}:{package_path}"))
+        if tagged_package.get("version") != version:
+            failures.append(f"MCP tagged package version does not match {tag}")
+        # A development checkout may advance from the release; unrelated history cannot.
+        run_git(mcp, "merge-base", "--is-ancestor", release_commit, head)
+    except (ValueError, json.JSONDecodeError) as error:
         failures.append(str(error))
+    checkout_dirty = bool(run_git(mcp, "status", "--porcelain"))
+    checkout_state = "release" if head == release_commit and not checkout_dirty else "development"
+    if release and (checkout_state != "release" or checkout_version != version):
+        failures.append(
+            f"MCP release requires clean checkout at {tag} ({release_commit}) "
+            f"with package version {version}; head={head}, dirty={checkout_dirty}, "
+            f"version={checkout_version}"
+        )
 
     expected_url = (
         "https://github.com/FoxsterDev/xuunity-mcp.git"
@@ -499,7 +513,7 @@ def validate_mcp_contract(root: Path, topology: dict[str, Any]) -> tuple[dict[st
     passing = 0
     for record in consumers:
         try:
-            errors = validate_consumer_pin(root / record["path"], expected_url, head)
+            errors = validate_consumer_pin(root / record["path"], expected_url, release_commit)
         except (OSError, ValueError, json.JSONDecodeError) as error:
             errors = [str(error)]
         if errors:
@@ -514,7 +528,12 @@ def validate_mcp_contract(root: Path, topology: dict[str, Any]) -> tuple[dict[st
         "tag_object": tag_object,
         "commit": head,
         "package_version": version,
-        "package_hash": head,
+        "package_hash": release_commit,
+        "release_commit": release_commit,
+        "checkout_version": checkout_version,
+        "checkout_state": checkout_state,
+        "checkout_dirty": checkout_dirty,
+        "validation_mode": "release" if release else "workspace",
         "consumer_url": expected_url,
         "consumers_passed": passing,
         "consumers_total": len(consumers),

@@ -30,6 +30,8 @@ FIXED_REQUIRED_FILES = (
     "AGENTS.md",
     "WORKSPACE.md",
     "AIOutput/Harness/KERNEL.md",
+    "AIOutput/Harness/mcp-contract.md",
+    "AIOutput/Harness/mcp-release-baseline.json",
     "AIOutput/Harness/current-handoff.md",
     "AIOutput/Registry/host_topology.yaml",
     "AIOutput/Registry/setup_status.yaml",
@@ -76,6 +78,8 @@ STOP_LABELS = {
 
 SEMANTIC_OWNERS = (
     "AIOutput/Harness/KERNEL.md",
+    "AIOutput/Harness/mcp-contract.md",
+    "AIOutput/Harness/mcp-release-baseline.json",
     "AIRoot/Modules/XUUnity/tasks/change_delivery.md",
     "AIRoot/Modules/XUUnity/reviews/post_implementation_impact_review.md",
     "ConnectivityCheckerPro/Harness/unity-adapter.md",
@@ -114,6 +118,7 @@ def topology_required_files(topology: dict) -> list[str]:
 def main() -> int:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--stop", action="store_true", help="run the bounded Stop-hook subset")
+    parser.add_argument("--mcp-release", action="store_true", help="also require clean MCP checkout at the configured release tag")
     args = parser.parse_args()
 
     failures: list[str] = []
@@ -166,7 +171,7 @@ def main() -> int:
         failures.extend(route_contract_failures(ROOT, topology))
         checks.append("conditional-routes-and-fallbacks")
         try:
-            mcp_facts, mcp_failures = validate_mcp_contract(ROOT, topology)
+            mcp_facts, mcp_failures = validate_mcp_contract(ROOT, topology, release=args.mcp_release)
         except Exception as error:
             mcp_facts, mcp_failures = {}, [f"MCP contract could not be resolved: {error}"]
         failures.extend(mcp_failures)

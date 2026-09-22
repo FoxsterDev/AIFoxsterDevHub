@@ -5,6 +5,7 @@ from __future__ import annotations
 
 import copy
 import json
+import subprocess
 import tempfile
 import unittest
 from pathlib import Path
@@ -19,6 +20,7 @@ from unity_harness_contract import (
     load_json,
     select_release_tag,
     validate_consumer_pin,
+    validate_mcp_contract,
     validate_topology,
     workspace_topology_mirror_failures,
 )
@@ -265,6 +267,112 @@ class HarnessContractTests(unittest.TestCase):
         with mock.patch("unity_harness_contract.load_topology", return_value=cross_project):
             _, errors = validate_topology(ROOT)
         self.assertTrue(any("outside git boundary" in error for error in errors))
+
+
+class McpReleaseBoundaryTests(unittest.TestCase):
+    def git(self, *args):
+        return subprocess.run(["git", "-C", str(self.repo), *args], check=True,
+                              capture_output=True, encoding="utf-8", timeout=20).stdout.strip()
+
+    def setUp(self):
+        temporary = tempfile.TemporaryDirectory(prefix="harness-release-")
+        self.addCleanup(temporary.cleanup)
+        self.root = Path(temporary.name)
+        self.repo = self.root / "mcp"
+        self.repo.mkdir()
+        self.git("init", "-q")
+        self.git("config", "user.name", "Harness Test")
+        self.git("config", "user.email", "harness@example.invalid")
+        self.git("config", "commit.gpgsign", "false")
+        self.git("config", "tag.gpgsign", "false")
+        self.package = self.repo / "packages/com.xuunity.light-mcp/package.json"
+        self.package.parent.mkdir(parents=True)
+        self.package.write_text('{"version":"9.8.7"}', encoding="utf-8")
+        self.git("add", ".")
+        self.git("commit", "-qm", "release")
+        self.release_commit = self.git("rev-parse", "HEAD")
+        self.git("tag", "-a", "v9.8.7", "-m", "release")
+        baseline = self.root / "AIOutput/Harness/mcp-release-baseline.json"
+        baseline.parent.mkdir(parents=True)
+        baseline.write_text(json.dumps({"schema_version": 1, "tag": "v9.8.7",
+                                        "commit": self.release_commit}), encoding="utf-8")
+        self.topology = {"boundaries": [{"id": "MCP", "path": "mcp", "parent": "none"}], "projects": []}
+        for index in range(7):
+            path = self.root / f"consumer{index}" / "Packages"
+            path.mkdir(parents=True)
+            (path / "manifest.json").write_text(json.dumps({"dependencies": {"com.xuunity.light-mcp": EXPECTED_URL}}), encoding="utf-8")
+            (path / "packages-lock.json").write_text(json.dumps({"dependencies": {"com.xuunity.light-mcp": {
+                "version": EXPECTED_URL, "hash": self.release_commit, "source": "git", "depth": 0}}}), encoding="utf-8")
+            self.topology["projects"].append({"id": str(index), "path": f"consumer{index}", "mcp_consumer": "true"})
+
+    def check(self, release=False):
+        return validate_mcp_contract(self.root, self.topology, release=release)
+
+    def advance(self):
+        (self.repo / "development.txt").write_text("development", encoding="utf-8")
+        self.git("add", ".")
+        self.git("commit", "-qm", "development")
+
+    def test_clean_release_passes_both_modes(self):
+        for mode in (False, True):
+            facts, failures = self.check(mode)
+            self.assertEqual([], failures)
+            self.assertEqual(7, facts["consumers_passed"])
+            self.assertEqual("release", facts["checkout_state"])
+
+    def test_development_head_does_not_replace_consumer_release_hash(self):
+        self.advance()
+        facts, failures = self.check()
+        self.assertEqual([], failures)
+        self.assertEqual("development", facts["checkout_state"])
+        self.assertNotEqual(facts["commit"], facts["package_hash"])
+        self.assertEqual(self.release_commit, facts["package_hash"])
+        self.assertTrue(any("requires clean checkout" in x for x in self.check(True)[1]))
+
+    def test_dirty_version_bump_is_development_not_release(self):
+        self.package.write_text('{"version":"9.8.8"}', encoding="utf-8")
+        facts, failures = self.check()
+        self.assertEqual([], failures)
+        self.assertTrue(facts["checkout_dirty"])
+        self.assertEqual("9.8.8", facts["checkout_version"])
+        self.assertTrue(self.check(True)[1])
+
+    def test_lock_cannot_point_to_unreleased_head(self):
+        self.advance()
+        path = self.root / "consumer0/Packages/packages-lock.json"
+        data = json.loads(path.read_text())
+        data["dependencies"]["com.xuunity.light-mcp"]["hash"] = self.git("rev-parse", "HEAD")
+        path.write_text(json.dumps(data), encoding="utf-8")
+        self.assertTrue(any("lock hash" in x for x in self.check()[1]))
+
+    def test_moved_tag_fails(self):
+        self.advance()
+        self.git("tag", "-fa", "v9.8.7", "-m", "moved")
+        self.assertTrue(any("baseline mismatch" in x for x in self.check()[1]))
+
+    def test_lightweight_and_missing_tags_fail(self):
+        self.git("tag", "-d", "v9.8.7")
+        self.assertTrue(self.check()[1])
+        self.git("tag", "v9.8.7")
+        self.assertTrue(any("baseline mismatch" in x for x in self.check()[1]))
+
+    def test_tagged_version_mismatch_fails(self):
+        self.package.write_text('{"version":"9.8.6"}', encoding="utf-8")
+        self.git("add", ".")
+        self.git("commit", "-qm", "incorrect version")
+        self.git("tag", "-fa", "v9.8.7", "-m", "incorrect")
+        self.assertTrue(any("tagged package version" in x for x in self.check()[1]))
+
+    def test_checkout_before_release_fails(self):
+        self.advance()
+        newer = self.git("rev-parse", "HEAD")
+        path = self.root / "AIOutput/Harness/mcp-release-baseline.json"
+        data = json.loads(path.read_text())
+        data["commit"] = newer
+        path.write_text(json.dumps(data), encoding="utf-8")
+        self.git("tag", "-fa", "v9.8.7", "-m", "new release")
+        self.git("checkout", "--detach", self.release_commit)
+        self.assertTrue(any("merge-base" in x for x in self.check()[1]))
 
 
 if __name__ == "__main__":
