@@ -1,0 +1,183 @@
+{
+  "schemaVersion": 1,
+  "status": "published-and-production-verified",
+  "date": "2026-09-08",
+  "repository": "FoxsterDev/foxsterlabs.com",
+  "pullRequest": "https://github.com/FoxsterDev/foxsterlabs.com/pull/18",
+  "reviewedCommit": "0079fb2a24d5190193a3a74cace9706810b81c5e",
+  "productionCommit": "f8ea38885f87882e0911ad2b36d80dd1f0096a43",
+  "ownerApproval": "Owner reply to the two staged article previews: да можно публикуй",
+  "localReleaseCheck": {
+    "result": "pass",
+    "steps": 11,
+    "articleCopyUnchangedAfterApproval": true,
+    "savedCheckoutMatchesValidatedFiles": 32
+  },
+  "preview": {
+    "deploymentId": "6e9972c6-d11f-45e0-9db8-2faf1bc0d05a",
+    "githubCI": "https://github.com/FoxsterDev/foxsterlabs.com/actions/runs/34176282426",
+    "checks": "passed",
+    "httpVerification": {
+      "origin": "https://6e9972c6.foxsterlabs.pages.dev",
+      "articles": [
+        {
+          "route": "/articles/why-click-delivery-needs-raycast-evidence/",
+          "status": 200,
+          "textMatchesApprovedBuild": true,
+          "images": 3,
+          "canonical": "https://foxsterlabs.com/articles/why-click-delivery-needs-raycast-evidence/",
+          "metaRobots": "default index",
+          "xRobotsTag": "noindex"
+        },
+        {
+          "route": "/articles/why-an-incomplete-ui-search-must-not-click/",
+          "status": 200,
+          "textMatchesApprovedBuild": true,
+          "images": 2,
+          "canonical": "https://foxsterlabs.com/articles/why-an-incomplete-ui-search-must-not-click/",
+          "metaRobots": "default index",
+          "xRobotsTag": "noindex"
+        }
+      ],
+      "assets": [
+        {
+          "path": "/_astro/button-behind-dialog.5hYb_sUi_1x8Nt6.svg",
+          "status": 200,
+          "sha256": "76c37728c524cfd889774530a3e76f249bbc39728b2c1ebc3e955b202ddf2661"
+        },
+        {
+          "path": "/_astro/click-delivery-evidence.zF_1fClF_153lHp.svg",
+          "status": 200,
+          "sha256": "71a0dba53b0e5648ea1f77003fe26f856dea974f95772c82e3c2515935a854dc"
+        },
+        {
+          "path": "/_astro/click-delivery-evidence.zF_1fClF_Z2l7sQA.svg",
+          "status": 200,
+          "sha256": "71a0dba53b0e5648ea1f77003fe26f856dea974f95772c82e3c2515935a854dc"
+        },
+        {
+          "path": "/_astro/guarded-ui-click-search-boundary.BWfzQFmi_ONTzk.svg",
+          "status": 200,
+          "sha256": "fc760c567b7108e22fc2b07b4dd5d5442c9d127827fb61e7684092892ce610f4"
+        },
+        {
+          "path": "/_astro/guarded-ui-click-search-boundary.BWfzQFmi_PKapp.svg",
+          "status": 200,
+          "sha256": "fc760c567b7108e22fc2b07b4dd5d5442c9d127827fb61e7684092892ce610f4"
+        },
+        {
+          "path": "/_astro/narrow-search-before-retry.B3AhX1Fe_1s5qNR.svg",
+          "status": 200,
+          "sha256": "3e86f654e073d378552adcdfd825cde8469ae2b0066f11717f958ecdcbac05c4"
+        },
+        {
+          "path": "/_astro/raycast-results.rjA7QoR3_Z2fGl16.svg",
+          "status": 200,
+          "sha256": "e4b9e0e6e1c16a9550ed9a70162eddbe2556777a8fa45045702a5ab7d1fda30b"
+        }
+      ],
+      "discovery": {
+        "articleHub": true,
+        "rss": true,
+        "sitemap": true
+      },
+      "robotsStatus": 200
+    },
+    "browser": {
+      "viewportWidths": [
+        375,
+        1440
+      ],
+      "imagesLoaded": 5,
+      "documentOverflow": false,
+      "consoleWarningsAndErrors": 0,
+      "keyboardSkipLink": "visible focus and activation verified"
+    }
+  },
+  "production": {
+    "deploymentId": "3a603ee2-3c0f-41b5-981b-5f7783aa57fa",
+    "githubCI": "https://github.com/FoxsterDev/foxsterlabs.com/actions/runs/34176599258",
+    "httpVerification": {
+      "origin": "https://foxsterlabs.com",
+      "articles": [
+        {
+          "route": "/articles/why-click-delivery-needs-raycast-evidence/",
+          "status": 200,
+          "textMatchesApprovedBuild": true,
+          "images": 3,
+          "canonical": "https://foxsterlabs.com/articles/why-click-delivery-needs-raycast-evidence/",
+          "metaRobots": "default index",
+          "xRobotsTag": ""
+        },
+        {
+          "route": "/articles/why-an-incomplete-ui-search-must-not-click/",
+          "status": 200,
+          "textMatchesApprovedBuild": true,
+          "images": 2,
+          "canonical": "https://foxsterlabs.com/articles/why-an-incomplete-ui-search-must-not-click/",
+          "metaRobots": "default index",
+          "xRobotsTag": ""
+        }
+      ],
+      "assets": [
+        {
+          "path": "/_astro/button-behind-dialog.5hYb_sUi_1x8Nt6.svg",
+          "status": 200,
+          "sha256": "76c37728c524cfd889774530a3e76f249bbc39728b2c1ebc3e955b202ddf2661"
+        },
+        {
+          "path": "/_astro/click-delivery-evidence.zF_1fClF_153lHp.svg",
+          "status": 200,
+          "sha256": "71a0dba53b0e5648ea1f77003fe26f856dea974f95772c82e3c2515935a854dc"
+        },
+        {
+          "path": "/_astro/click-delivery-evidence.zF_1fClF_Z2l7sQA.svg",
+          "status": 200,
+          "sha256": "71a0dba53b0e5648ea1f77003fe26f856dea974f95772c82e3c2515935a854dc"
+        },
+        {
+          "path": "/_astro/guarded-ui-click-search-boundary.BWfzQFmi_ONTzk.svg",
+          "status": 200,
+          "sha256": "fc760c567b7108e22fc2b07b4dd5d5442c9d127827fb61e7684092892ce610f4"
+        },
+        {
+          "path": "/_astro/guarded-ui-click-search-boundary.BWfzQFmi_PKapp.svg",
+          "status": 200,
+          "sha256": "fc760c567b7108e22fc2b07b4dd5d5442c9d127827fb61e7684092892ce610f4"
+        },
+        {
+          "path": "/_astro/narrow-search-before-retry.B3AhX1Fe_1s5qNR.svg",
+          "status": 200,
+          "sha256": "3e86f654e073d378552adcdfd825cde8469ae2b0066f11717f958ecdcbac05c4"
+        },
+        {
+          "path": "/_astro/raycast-results.rjA7QoR3_Z2fGl16.svg",
+          "status": 200,
+          "sha256": "e4b9e0e6e1c16a9550ed9a70162eddbe2556777a8fa45045702a5ab7d1fda30b"
+        }
+      ],
+      "discovery": {
+        "articleHub": true,
+        "rss": true,
+        "sitemap": true
+      },
+      "robotsStatus": 200
+    },
+    "checks": "GitHub Validate and build and Cloudflare Pages passed",
+    "browser": {
+      "articlesObserved": 2,
+      "imagesLoaded": 5,
+      "documentOverflow": false,
+      "consoleWarningsAndErrors": 0
+    },
+    "deploymentUrl": "https://3a603ee2.foxsterlabs.pages.dev"
+  },
+  "workflow": {
+    "siteRules": "/Users/siarheikha/Documents/FoxsterLabs/docs/engineering-story-pipeline.md",
+    "hostBridge": "AIOutput/Publishing/README.md",
+    "publisherAutomation": "foxster-publisher-daily-shadow-scan",
+    "publisherAuthority": "private candidate generation; publication approval unchanged"
+  },
+  "verifiedAt": "2026-09-08T01:28:27.630576+00:00",
+  "remainingPublicationBlockers": []
+}

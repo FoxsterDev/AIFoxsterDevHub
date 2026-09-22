@@ -28,6 +28,7 @@ Use it to select shared prompt families, define load order, and route project-lo
 - For tasks under `AIRoot/Operations/XUUnityLightUnityMcp/`, route to its child-owned exact `AIRoot/Operations/XUUnityLightUnityMcp/AGENTS.md` before project-specific work. This independently versioned tooling satellite remains standalone-capable; the host only augments it when available.
 - For tasks under `AIRoot/Operations/XUUnityLightUnityMcp/docs/clients/`, route through the MCP project router first, then the local client-docs router in that folder.
 - Resolve active projects and Git boundaries from `AIOutput/Registry/host_topology.yaml`. Run `python3 scripts/validate-unity-privacy.py --require-launch-authority` immediately before any Unity launch; a red Hub Cloud-identity check blocks Unity, not static routing work. Editor Analytics is not a launch blocker for this account.
+- For substantive owner-product feature work, fixes, releases, or SOW planning, route content preparation through `AIOutput/Publishing/README.md`. Capture the reader problem, cause, change, and useful visual during the task; use the existing Foxster Labs author/reviewer pipeline for eligible stories.
 
 ## Fast Shortcuts
 - `xuunity fix this bug`
