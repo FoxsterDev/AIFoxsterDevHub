@@ -38,3 +38,10 @@ Updated: 2026-09-05
   part of this handoff.
 - Detailed outcome:
   `AIOutput/Harness/validation-evidence-2026-09-02.md`.
+
+
+## Repository publication correction — 2026-10-19
+
+The owner authorized completion of the interrupted main integration and retirement of integrated feature branches. CCP main6c43fb5 includes the previously missing Hub-pinned245b7345; both are now remotely retrievable. The composed candidate passes106 license-free tooling tests and13 static host contracts. DAS main3739515 includes the two upstream CI commits and aligns logger source-version documentation with package4.4.4; `scripts/validate_repo.py` passes for all three packages. Existing install tags, package versions and runtime source are unchanged.
+
+The Hub updates only those two verified child gitlinks. Its accepted AIRoot74227d24 and nested MCP41e79e88 dependency baseline remains unchanged; newer upstream main commits are already published and are not silently adopted as a tooling upgrade. These Git receipts do not refresh the historical Unity, device, consumer or release acceptance above. Hosted CI unavailable because of billing is not claimed to have passed. Full portfolio live refs and retained/retired branch evidence are in `/tmp/integration-resume-20261019/`.
