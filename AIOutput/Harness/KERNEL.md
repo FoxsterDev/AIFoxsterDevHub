@@ -1,6 +1,6 @@
 # Unity Unified Harness Kernel
 
-Status: active | Owner: AIFoxsterDevHub | Updated: 2026-09-02
+Status: active | Owner: AIFoxsterDevHub | Updated: 2026-11-05
 
 ## Shape And Ownership
 
@@ -14,6 +14,22 @@ Load project memory only for the target. Satellites work without the Hub or
 private overlay. MCP validation follows `AIOutput/Harness/mcp-contract.md`.
 Public Unity rules belong in `AIRoot/Modules/XUUnity/`; the
 topology owner is `AIOutput/Registry/host_topology.yaml`.
+
+## Hosted CI Cost Approval
+
+New, enabled or materially expanded billable hosted CI in private repositories
+requires the owner's explicit CI request or prior approval of runner OS,
+duration, matrix, triggers and expected cost. Included quota is a shared budget,
+not permission to add work. Existing approved fast core checks may run normally;
+new builds, full suites, schedules, retries or higher limits need approval.
+
+Keep Apple builds and expensive diagnostics local under risk-based selection.
+XUUnity's hosted core remains Linux/Windows; retain meaningful Windows proof.
+Core checks target 60 seconds; warn on slow jobs and use finite per-step/job
+limits. Investigate a job over two minutes instead of silently extending it;
+any expensive exception needs owner approval. Skipped is not passing proof.
+Use existing annotations/summary and timeout failures; do not create a paid
+monitoring job or claim external notification delivery without verification.
 
 ## Lanes
 
